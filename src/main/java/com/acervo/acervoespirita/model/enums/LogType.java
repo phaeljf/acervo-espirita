@@ -1,0 +1,22 @@
+package com.acervo.acervoespirita.model.enums;
+
+public enum LogType {
+
+    USER_CREATED,
+    USER_UPDATED,
+    USER_DELETED,
+    BOOK_CREATED,
+    BOOK_UPDATED,
+    BOOK_DELETED,
+    BOOK_COPY_CREATED,
+    BOOK_COPY_UPDATED,
+    BOOK_COPY_DELETED,
+    LOCATION_CREATED,
+    LOCATION_UPDATED,
+    LOCATION_DELETED,
+    BOOK_LOANED,
+    BOOK_RETURNED,
+    LOAN_CREATED,
+    LOAN_CLOSED,
+    CONFIGURATION_UPDATED
+}
