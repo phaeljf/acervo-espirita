@@ -60,8 +60,19 @@ Um User com Role STAFF pode criar um USER com role USER, mas não pode criar out
 9 - No service, obvio
 
 10 - 
-User 1:N Loan -> Ta meio certo -> User 1:1 Loan (ativo), mas pode sr User 1:N Loan (1 ativo e N inativos)
-Loan 1:N LoanItem -> Certo
-Book 1:N LoanItem -> Isso depnde agora do topico 1
-Book 1:1 Location -> Exato, 1 livro sempre vai estar em 1 localização que vai mudar ou até ser a mesma a cada empréstimo
-
+📚 Book
+1 → N BookCopy
+📦 BookCopy
+N → 1 Book
+N → 1 Location
+1 → N LoanItem
+📍 Location
+1 → N BookCopy
+📄 Loan
+N → 1 User
+1 → N LoanItem
+📦 LoanItem
+N → 1 Loan
+N → 1 BookCopy
+👤 User
+1 → N Loan

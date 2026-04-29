@@ -1,5 +1,7 @@
 package com.acervo.acervoespirita.model;
 
+import com.acervo.acervoespirita.model.enums.LoanStatus;
+import com.acervo.acervoespirita.model.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,9 +21,20 @@ public class Loan implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
-    private LocalDate loanDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "handled_by_id")
     private User handledBy;
+
+    private LocalDate loanDate;
+
+    private LoanStatus status;
+
+
 
     @Builder
     public Loan(User user, LocalDate loanDate, User handledBy) {
@@ -40,5 +53,9 @@ public class Loan implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    public boolean isActive() {
+        return status == LoanStatus.OPEN;
     }
 }
