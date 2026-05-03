@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@Table(name = "tb_loanItem")
+@Table(name = "loan_items")
 @Getter
 @Setter
 @ToString(exclude = {"loan", "bookCopy"})

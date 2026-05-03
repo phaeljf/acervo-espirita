@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "tb_bookcopy")
+@Table(name = "book_copies")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -42,5 +42,9 @@ public class BookCopy implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    public boolean isAvailable() {
+        return status == BookStatus.AVAILABLE;
     }
 }

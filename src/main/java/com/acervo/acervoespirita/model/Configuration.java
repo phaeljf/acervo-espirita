@@ -8,7 +8,7 @@ import lombok.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name="tb_configuration")
+@Table(name="configurations")
 @Getter
 @Setter
 @NoArgsConstructor

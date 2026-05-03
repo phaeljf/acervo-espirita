@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "tb_log")
+@Table(name = "logs")
 @Setter
 @Getter
 @ToString(exclude = {"user"})
