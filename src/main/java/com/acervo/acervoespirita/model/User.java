@@ -116,10 +116,6 @@ public class User implements Serializable {
         return role == UserRole.STAFF;
     }
 
-    public boolean isUser() {
-        return role == UserRole.USER;
-    }
-
     public void changeRole(UserRole newRole) {
         if (newRole == null) {
             throw new IllegalArgumentException("Role inválida");

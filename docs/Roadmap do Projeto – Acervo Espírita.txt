@@ -15,8 +15,8 @@ Vou te guiar na ordem certa pra:
 ✔ Levantamento de requisitos
 
 👉 Se ainda não fez:
-
 Subir levantamento-requisitos.md no /docs
+
 🥈 FASE 2 — Modelagem (ESSENCIAL) ← AGORA
 
 - Modelagem do banco com entidade única `User`
