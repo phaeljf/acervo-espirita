@@ -8,12 +8,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(
-        name = "locations",
-        uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"shelf", "position"})
-        }
-)
+@Table(name = "locations", uniqueConstraints = {@UniqueConstraint(columnNames = {"shelf", "position"})})
 @Getter
 @NoArgsConstructor
 @ToString
@@ -39,17 +34,14 @@ public class Location implements Serializable {
             throw new IllegalArgumentException("Prateleira não pode ser vazia");
         }
 
-        this.shelf = normalize(shelf);
-        this.position = normalize(position);
+        this.shelf = shelf.trim().toUpperCase();
+        this.position = position.trim().toUpperCase();
     }
 
     // tratamento da criação de estante
-    private String normalize(String value) {
-        return value.trim().toUpperCase();
-    }
 
-    public String getCode() {
-        return shelf + "-" + position;
+    public String getLocation() {
+        return shelf + " - " + position;
     }
 
     // Equals hashcode
