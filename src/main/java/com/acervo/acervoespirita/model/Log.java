@@ -21,7 +21,11 @@ public class Log implements Serializable {
     private Long id;
 
     private LogType type;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
+    
     private LocalDateTime dateTime;
     private String description;
 

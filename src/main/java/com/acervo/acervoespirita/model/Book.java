@@ -10,6 +10,7 @@ import java.util.*;
 @Entity
 @Table(name = "books")
 @Getter
+@Setter
 @NoArgsConstructor
 @ToString
 public class Book implements Serializable {

@@ -23,6 +23,7 @@ public class BookCopy implements Serializable {
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
     private Location location;
 
     @Enumerated(EnumType.STRING)
@@ -35,16 +36,16 @@ public class BookCopy implements Serializable {
     @Builder
     public BookCopy(Book book, BookStatus status, Location location, String code) {
         if (book == null) {
-            throw new IllegalArgumentException("Book é obrigatório");
+            throw new IllegalArgumentException("Livro é obrigatório");
         }
         if (code == null || code.isBlank()) {
             throw new IllegalArgumentException("Código da cópia é obrigatório");
         }
 
         this.book = book;
-        this.status = BookStatus.AVAILABLE;
         this.location = location;
         this.code = code.trim().toUpperCase();
+        this.status = BookStatus.AVAILABLE;
     }
 
     // Metodo de verificação
@@ -65,6 +66,7 @@ public class BookCopy implements Serializable {
         if (location == null) {
             throw new IllegalArgumentException("Localização obrigatória");
         }
+
         this.status = BookStatus.AVAILABLE;
         this.location = location;
     }
