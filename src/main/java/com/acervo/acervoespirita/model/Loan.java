@@ -26,6 +26,7 @@ public class Loan implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @Setter(AccessLevel.PACKAGE)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)

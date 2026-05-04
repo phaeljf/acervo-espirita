@@ -20,6 +20,7 @@ public class BookCopy implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
+    @Setter(AccessLevel.PACKAGE)
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY)
