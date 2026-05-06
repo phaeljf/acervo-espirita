@@ -36,7 +36,9 @@ public class User implements Serializable {
 
     // Tanto o email como phone podem estar vazio sao dados so para contatos
     @Email
+    @Column(unique = true, nullable = false)
     private String email;
+
     private String phone;
 
     @Column(nullable = false)
