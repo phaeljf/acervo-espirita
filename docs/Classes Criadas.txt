@@ -1,0 +1,551 @@
+📚 Resumo das Classes Criadas — Sistema de Gerenciamento de Acervo Espírita
+🧍 User
+Representa os usuários do sistema.
+Responsabilidades:
+
+
+Armazenar dados cadastrais:
+
+
+nome
+
+
+username
+
+
+email
+
+
+telefone
+
+
+role
+
+
+status
+
+
+
+
+Controlar permissões:
+
+
+USER
+
+
+STAFF
+
+
+ADMIN
+
+
+
+
+Controlar status do usuário:
+
+
+ACTIVE
+
+
+INACTIVE
+
+
+
+
+Gerenciar empréstimos vinculados ao usuário
+
+
+Verificar:
+
+
+se está ativo
+
+
+se possui empréstimo ativo
+
+
+se pode realizar empréstimos
+
+
+se pode operar o sistema
+
+
+
+
+Permitir alteração controlada de role
+
+
+Impedir inativação com empréstimo ativo
+
+
+Registrar datas de criação e atualização
+
+
+
+📖 Book
+Representa a obra/livro abstrato do acervo.
+Responsabilidades:
+
+
+Armazenar:
+
+
+título
+
+
+autor
+
+
+categoria
+
+
+
+
+Controlar ativação/desativação do livro
+
+
+Gerenciar lista de cópias físicas (BookCopy)
+
+
+Verificar:
+
+
+quantidade total de cópias
+
+
+quantidade disponível
+
+
+existência de cópias disponíveis
+
+
+
+
+Manter relacionamento bidirecional com BookCopy
+
+
+
+📚 BookCopy
+Representa um exemplar físico individual de um livro.
+Responsabilidades:
+
+
+Armazenar:
+
+
+código único
+
+
+status do exemplar
+
+
+localização física
+
+
+
+
+Relacionar exemplar ao Book
+
+
+Controlar status:
+
+
+AVAILABLE
+
+
+LOANED
+
+
+
+
+Marcar exemplar como:
+
+
+emprestado
+
+
+devolvido
+
+
+
+
+Atualizar localização física
+
+
+Remover localização enquanto emprestado
+
+
+
+🏷️ Location
+Representa a localização física de um exemplar no acervo.
+Responsabilidades:
+
+
+Armazenar:
+
+
+estante
+
+
+posição/prateleira
+
+
+
+
+Garantir combinação única:
+
+
+shelf + position
+
+
+
+
+Gerar representação textual da localização
+
+
+Validar preenchimento dos dados
+
+
+
+📦 Loan
+Representa um empréstimo realizado no sistema.
+Responsabilidades:
+
+
+Relacionar:
+
+
+usuário que recebeu empréstimo
+
+
+funcionário responsável
+
+
+
+
+Controlar:
+
+
+data do empréstimo
+
+
+data limite
+
+
+status do empréstimo
+
+
+
+
+Gerenciar lista de itens emprestados (LoanItem)
+
+
+Calcular data de devolução com base em Configuration
+
+
+Verificar atraso do empréstimo
+
+
+Encerrar empréstimo
+
+
+Verificar se empréstimo está ativo
+
+
+Status:
+
+
+OPEN
+
+
+CLOSED
+
+
+
+📄 LoanItem
+Representa um item individual dentro de um empréstimo.
+Responsabilidades:
+
+
+Relacionar:
+
+
+empréstimo
+
+
+exemplar físico (BookCopy)
+
+
+
+
+Controlar devolução individual
+
+
+Registrar data de devolução
+
+
+Marcar exemplar como devolvido
+
+
+Verificar se item já foi devolvido
+
+
+
+⚙️ Configuration
+Representa as configurações globais do sistema.
+Responsabilidades:
+
+
+Armazenar:
+
+
+quantidade máxima de livros por empréstimo
+
+
+limite de dias de empréstimo
+
+
+permissão de renovação
+
+
+
+
+Manter configuração persistente única do sistema
+
+
+Configurações:
+
+
+maxBooksPerLoan
+
+
+loanDaysLimit
+
+
+allowRenewal
+
+
+
+📜 Log
+Representa registros de auditoria do sistema.
+Responsabilidades:
+
+
+Registrar:
+
+
+tipo da operação
+
+
+usuário responsável
+
+
+data/hora
+
+
+descrição da ação
+
+
+
+
+Permitir rastreamento de alterações e operações
+
+
+
+🎭 Enums Criados
+👤 UserRole
+Define permissões do usuário:
+
+
+USER
+
+
+STAFF
+
+
+ADMIN
+
+
+
+🚦 UserStatus
+Define status do usuário:
+
+
+ACTIVE
+
+
+INACTIVE
+
+
+
+📚 BookStatus
+Define status do exemplar:
+
+
+AVAILABLE
+
+
+LOANED
+
+
+
+📦 LoanStatus
+Define status do empréstimo:
+
+
+OPEN
+
+
+CLOSED
+
+
+
+📜 LogType
+Define tipos de logs do sistema:
+Usuários
+
+
+USER_CREATED
+
+
+USER_UPDATED
+
+
+USER_DELETED
+
+
+Livros
+
+
+BOOK_CREATED
+
+
+BOOK_UPDATED
+
+
+BOOK_DELETED
+
+
+Exemplares
+
+
+BOOK_COPY_CREATED
+
+
+BOOK_COPY_UPDATED
+
+
+BOOK_COPY_DELETED
+
+
+Localizações
+
+
+LOCATION_CREATED
+
+
+LOCATION_UPDATED
+
+
+LOCATION_DELETED
+
+
+Empréstimos
+
+
+BOOK_LOANED
+
+
+BOOK_RETURNED
+
+
+LOAN_CREATED
+
+
+LOAN_CLOSED
+
+
+Configuração
+
+
+CONFIGURATION_UPDATED
+
+
+
+🧠 Estrutura Atual do Sistema
+Relacionamentos principais
+User
+
+
+1:N Loan
+
+
+Loan
+
+
+1:N LoanItem
+
+
+LoanItem
+
+
+N:1 BookCopy
+
+
+Book
+
+
+1:N BookCopy
+
+
+BookCopy
+
+
+N:1 Location
+
+
+
+✅ Funcionalidades já implementadas no domínio
+
+
+Controle de usuários
+
+
+Controle de permissões
+
+
+Controle de status
+
+
+Controle de empréstimos
+
+
+Devolução individual de livros
+
+
+Controle de exemplares físicos
+
+
+Controle de localização física
+
+
+Controle de disponibilidade
+
+
+Regras de empréstimo
+
+
+Auditoria/logs
+
+
+Configuração persistente do sistema
+
+
+Relacionamentos JPA
+
+
+Métodos de domínio ricos
+
+
+Proteção parcial contra inconsistências de domínio
+

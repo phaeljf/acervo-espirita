@@ -1,0 +1,124 @@
+# Resumo dos Repositories Criados
+
+## UserRepository
+
+* Localizar usuário por e-mail (login)
+  `findByEmail(String email)`
+
+* Buscar usuários por nome parcial
+  `findByNameContainingIgnoreCase(String name)`
+
+* Localizar usuário por username
+  `findByUsername(String username)`
+
+* Verificar existência de e-mail
+  `existsByEmail(String email)`
+
+* Verificar existência de username
+  `existsByUsername(String username)`
+
+* Listar usuários por status
+  `findByStatus(UserStatus status)`
+
+* Listar usuários por role
+  `findByRole(UserRole role)`
+
+## BookRepository
+
+* Buscar livros por título parcial
+  `findByTitleContainingIgnoreCase(String title)`
+
+* Buscar livros por autor parcial
+  `findByAuthorContainingIgnoreCase(String author)`
+
+* Buscar livros por categoria
+  `findByCategoryContainingIgnoreCase(String category)`
+
+* Buscar livros por título e autor
+  `findByTitleContainingIgnoreCaseAndAuthorContainingIgnoreCase(String title, String author)`
+
+## BookCopyRepository
+
+* Buscar exemplar pelo código único
+  `findByCode(String code)`
+
+* Verificar existência de código do exemplar
+  `existsByCode(String code)`
+
+* Buscar exemplares por status
+  `findByStatus(BookStatus status)`
+
+* Buscar exemplares de um livro
+  `findByBook(Book book)`
+
+* Buscar exemplares de um livro por status
+  `findByBookAndStatus(Book book, BookStatus status)`
+
+* Buscar exemplares por localização
+  `findByLocation(Location location)`
+
+## LoanRepository
+
+* Buscar empréstimo por usuário e status
+  `findByUserAndStatus(User user, LoanStatus status)`
+
+* Verificar existência de empréstimo por usuário e status
+  `existsByUserAndStatus(User user, LoanStatus status)`
+
+* Listar empréstimos por status
+  `findByStatus(LoanStatus status)`
+
+* Listar empréstimos de um usuário
+  `findByUser(User user)`
+
+* Buscar empréstimos atrasados
+  `findByDueDateBeforeAndStatus(LocalDate dueDate, LoanStatus status)`
+
+## LoanItemRepository
+
+* Listar itens de um empréstimo
+  `findByLoan(Loan loan)`
+
+* Buscar item pelo exemplar físico
+  `findByBookCopy(BookCopy bookCopy)`
+
+* Listar itens não devolvidos
+  `findByReturnedAtIsNull()`
+
+* Listar itens devolvidos
+  `findByReturnedAtIsNotNull()`
+
+* Buscar item de um empréstimo específico
+  `findByLoanAndBookCopy(Loan loan, BookCopy bookCopy)`
+
+## LocationRepository
+
+* Buscar localização por estante e posição
+  `findByShelfAndPosition(String shelf, String position)`
+
+* Verificar existência de localização
+  `existsByShelfAndPosition(String shelf, String position)`
+
+* Listar localizações ordenadas
+  `findAllByOrderByShelfAscPositionAsc()`
+
+## LogRepository
+
+* Buscar logs por usuário
+  `findByUser(User user)`
+
+* Buscar logs por tipo
+  `findByType(LogType type)`
+
+* Buscar logs entre datas
+  `findByCreatedAtBetween(Instant start, Instant end)`
+
+* Buscar logs por usuário e tipo
+  `findByUserAndType(User user, LogType type)`
+
+* Listar logs ordenados do mais recente para o mais antigo
+  `findAllByOrderByCreatedAtDesc()`
+
+## ConfigurationRepository
+
+* Não possui consultas customizadas no momento.

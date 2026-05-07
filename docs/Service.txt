@@ -1,0 +1,249 @@
+UserService
+- Cadastro
+- - Verificar se nome foi informado
+- - Verificar se e-mail já existe
+- - Verificar se username já existe
+- - Definir role inicial permitida
+- - Registrar data de criação
+- - Registrar usuário como ativo
+
+- Permissões
+- - Verificar se usuário pode operar sistema
+- - Verificar se usuário pode realizar empréstimo
+- - Verificar se usuário pode alterar roles
+- - Verificar se STAFF pode criar apenas USER
+- - Verificar se usuário pode visualizar logs
+- - Atualização
+- - Atualizar dados cadastrais
+- - Alterar role do usuário
+- - Registrar data de atualização
+
+- Status
+- - Verificar se usuário está ativo
+- - Permitir inativação de usuário
+- - Impedir inativação com empréstimo ativo
+- - Permitir reativação de usuário
+
+- Consultas
+- - Buscar usuário por e-mail
+- - Buscar usuário por username
+- - Buscar usuário por nome
+- - Listar usuários ativos
+- - Listar usuários inativos
+- - Listar usuários por role
+
+BookService
+- Cadastro
+- - Verificar título obrigatório
+- - Verificar autor obrigatório
+- - Criar obra/livro
+- - Registrar livro ativo
+
+- Controle
+- - Atualizar dados do livro
+- - Ativar livro
+- - Inativar livro
+- - Verificar existência de exemplares
+- - Verificar disponibilidade de exemplares
+
+- Integridade
+- - Impedir exclusão/inativação de livro com empréstimo ativo
+- - Verificar existência de exemplares emprestados
+
+- - Consultas
+- - Buscar por título
+- - Buscar por autor
+- - Buscar por categoria
+- - Buscar por título e autor
+
+BookCopyService
+- Cadastro
+- - Verificar código único do exemplar
+- - Associar exemplar ao livro
+- - Associar localização inicial
+- - Definir status inicial AVAILABLE
+- - Controle de empréstimo
+- - Verificar se exemplar está disponível
+- - Marcar exemplar como emprestado
+- - Alterar status para LOANED
+- - Remover localização enquanto emprestado
+- - Controle de devolução
+- - Marcar exemplar como devolvido
+- - Alterar status para AVAILABLE
+- - Atualizar localização física
+
+- Controle
+- - Atualizar dados do exemplar
+- - Alterar localização do exemplar
+
+- Consultas
+- - Buscar exemplar por código
+- - Buscar exemplares disponíveis
+- - Buscar exemplares emprestados
+- - Buscar exemplares de um livro
+- - Buscar exemplares por localização
+
+LocationService
+- Cadastro
+- - Verificar estante obrigatória
+- - Verificar posição obrigatória
+- - Verificar combinação única shelf + position
+
+- Controle
+- - Atualizar dados da localização
+- - Gerar representação textual da localização
+
+- Integridade
+- - Impedir exclusão de localização em uso
+- - Verificar existência de exemplares associados
+
+- Consultas
+- - Buscar localização por estante e posição
+- - Listar localizações ordenadas
+
+LoanService
+- - Criação de empréstimo
+- - Verificar se usuário existe
+- - Verificar se usuário está ativo
+- - Verificar se usuário já possui empréstimo aberto
+- - Verificar quantidade máxima de livros permitida
+- - Verificar se lista de livros foi informada
+- - Verificar se todos exemplares estão disponíveis
+- - Criar empréstimo
+- - Registrar funcionário responsável
+- - Definir data do empréstimo
+- - Calcular data limite
+- - Definir status OPEN
+
+- Controle de empréstimo
+- - Adicionar itens ao empréstimo
+- - Associar exemplares ao empréstimo
+- - Marcar exemplares como emprestados
+
+- Controle de atraso
+- - Verificar se empréstimo está atrasado
+- - Ignorar atraso se loanDaysLimit = 0
+- - Identificar itens pendentes atrasados
+- - Listar empréstimos atrasados
+- - Listar livros atrasados
+
+- Controle de devolução
+- - Permitir devolução individual por item
+- - Verificar se item já foi devolvido
+- - Registrar data de devolução
+- - Registrar funcionário responsável pela devolução
+- - Atualizar status do exemplar
+- - Atualizar localização do exemplar
+- - Verificar se todos itens foram devolvidos
+- - Encerrar empréstimo automaticamente
+- - Alterar status para CLOSED
+
+- Renovação
+- - Verificar se renovação é permitida
+- - Renovar prazo do empréstimo
+
+- Consultas
+- - Buscar empréstimo ativo do usuário
+- - Buscar histórico de empréstimos do usuário
+- - Buscar empréstimos abertos
+- - Buscar empréstimos fechados
+- - Buscar empréstimos atrasados
+
+LoanItemService
+- Controle
+- - Associar exemplar ao empréstimo
+- - Registrar devolução individual
+- - Verificar se item já foi devolvido
+- - Impedir devolução duplicada
+
+- Consultas
+- - Buscar itens do empréstimo
+- - Buscar itens devolvidos
+- - Buscar itens pendentes
+
+ConfigurationService
+- Inicialização
+- - Criar configuração padrão na primeira execução do sistema
+
+- Controle
+- - Atualizar maxBooksPerLoan
+- - Atualizar loanDaysLimit
+- - Atualizar allowRenewal
+
+- Validações
+- - Verificar valores negativos
+- - Validar limites mínimos
+- - Validar consistência das configurações
+
+- Persistência
+- - Garantir configuração única do sistema
+
+- Consultas
+- - Buscar configuração atual do sistema
+
+LogService
+- Registro
+- - Registrar criação de usuário
+- - Registrar atualização de usuário
+- - Registrar alteração de role
+- - Registrar inativação de usuário
+- - Registrar cadastro de livro
+- - Registrar atualização de livro
+- - Registrar cadastro de exemplar
+- - Registrar alteração de exemplar
+- - Registrar alteração de localização
+- - Registrar criação de empréstimo
+- - Registrar devolução de item
+- - Registrar encerramento de empréstimo
+- - Registrar alteração de configuração
+- - Registrar login
+- - Registrar operações importantes do sistema
+
+- Segurança
+- - Permitir visualização apenas para ADMIN
+
+- Consultas
+- - Buscar logs por usuário
+- - Buscar logs por tipo
+- - Buscar logs por período
+- - Buscar logs ordenados do mais recente
+
+AuthService
+- Login
+- - Verificar existência do e-mail
+- - Verificar se usuário está ativo
+- - Autenticar usuário
+- - Registrar login no sistema
+
+- Sessão
+- - Manter usuário autenticado
+- - Encerrar sessão/logout
+
+ReportService
+- Relatório de usuário
+- - Quantidade total de usuários
+- - Quantidade de usuários ativos
+- - Quantidade de usuários inativos
+- - Quantidade de usuários por role
+- - Usuários com empréstimo ativo
+- - Usuários com maior número de empréstimos
+
+- Relatórios de acervo
+- - Quantidade total de livros
+- - Quantidade total de exemplares
+- - Quantidade de autores
+- - Livros por categoria
+- - Livros por localização
+
+- Relatórios de empréstimos
+- - Livros emprestados
+- - Livros disponíveis
+- - Empréstimos abertos
+- - Empréstimos fechados
+- - Livros atrasados
+- - Histórico de empréstimos
+- - Usuários com maior número de empréstimos
+
+- Relatórios avançados
+- - Frequência de empréstimos por período
+- - Ranking de autores mais lidos
