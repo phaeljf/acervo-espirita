@@ -17,10 +17,13 @@ public interface LogRepository extends JpaRepository<Log, Long> {
     List<Log> findByType(LogType type);
 
     // busca logs entre datas
-    List<Log> findByCreatedAtBetween(
+    List<Log> findByDateTimeBetween(
             Instant start,
             Instant end
     );
+
+    // lista logs ordenados do mais recente para o mais antigo
+    List<Log> findAllByOrderByDateTimeDesc();
 
     // busca logs do usuário por tipo
     List<Log> findByUserAndType(
@@ -28,7 +31,7 @@ public interface LogRepository extends JpaRepository<Log, Long> {
             LogType type
     );
 
-    // lista logs ordenados do mais recente para o mais antigo
-    List<Log> findAllByOrderByCreatedAtDesc();
+
+
 
 }

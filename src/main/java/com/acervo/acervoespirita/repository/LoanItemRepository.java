@@ -17,15 +17,14 @@ public interface LoanItemRepository extends JpaRepository<LoanItem, Long> {
     Optional<LoanItem> findByBookCopy(BookCopy bookCopy);
 
     // lista itens ainda não devolvidos
-    List<LoanItem> findByReturnedAtIsNull();
+    List<LoanItem> findByReturnDateIsNull();
 
     // lista itens devolvidos
-    List<LoanItem> findByReturnedAtIsNotNull();
+    List<LoanItem> findByReturnDateIsNotNull();
 
     // busca item de um empréstimo específico
     Optional<LoanItem> findByLoanAndBookCopy(
             Loan loan,
             BookCopy bookCopy
     );
-
 }

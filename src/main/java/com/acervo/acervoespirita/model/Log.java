@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -20,20 +21,25 @@ public class Log implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private LogType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private LocalDateTime dateTime;
+    @Column(nullable = false)
+    private Instant dateTime;
+
+    @Column(nullable = false)
     private String description;
 
     @Builder
-    public Log(LogType type, User user, LocalDateTime dateTime, String description) {
+    public Log(LogType type, User user, String description) {
         this.type = type;
         this.user = user;
-        this.dateTime = dateTime;
+        this.dateTime = Instant.now();
         this.description = description;
     }
 
