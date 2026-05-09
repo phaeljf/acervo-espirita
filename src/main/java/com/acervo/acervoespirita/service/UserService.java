@@ -50,13 +50,7 @@ public class UserService {
 
     // Atualiza dados básicos do usuário
     @Transactional
-    public User updateUser(
-            Long id,
-            String name,
-            String email,
-            String phone,
-            User updatedBy
-    ) {
+    public User updateUser(Long id,String name,String email,String phone,User updatedBy) {
 
         User user = findById(id);
 

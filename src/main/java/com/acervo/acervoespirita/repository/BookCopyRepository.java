@@ -24,13 +24,16 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
     List<BookCopy> findByBook(Book book);
 
     // busca exemplares disponíveis de um livro
-    List<BookCopy> findByBookAndStatus(
-            Book book,
-            BookStatus status
-    );
+    List<BookCopy> findByBookAndStatus(Book book, BookStatus status);
 
     // busca exemplares por localização
     List<BookCopy> findByLocation(Location location);
 
+    // valida de existe uma localização
+    boolean existsByLocation(Location location);
+
+    boolean existsByBook(Book book);
+
+    Optional<BookCopy> findById(Long id);
 
 }

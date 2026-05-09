@@ -22,4 +22,10 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             String author
     );
 
+
+    List<Book> findByActiveTrue();
+
+    List<Book> findByActiveFalse();
+
+
 }

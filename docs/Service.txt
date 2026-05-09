@@ -1,249 +1,200 @@
-UserService
-- Cadastro
-- - Verificar se nome foi informado
-- - Verificar se e-mail já existe
-- - Verificar se username já existe
-- - Definir role inicial permitida
-- - Registrar data de criação
-- - Registrar usuário como ativo
+ConfigurationService 
+Controle das configurações globais do sistema
+public void initializeDefaultConfiguration()
+ - Inicializa configuração padrão do sistema
+ - Cria configuração inicial caso ainda não exista
+ - public Configuration getCurrentConfiguration()
+ - Retorna configuração atual do sistema
+ - public Configuration updateMaxBooksPerLoan(Integer maxBooksPerLoan)
+ - Atualiza limite máximo de livros por empréstimo
+ - Valida se valor não é negativo
+ - public Configuration updateLoanDaysLimit(Integer loanDaysLimit)
+ - Atualiza quantidade máxima de dias de empréstimo
+ - Valida se valor não é negativo
+ - public Configuration updateAllowRenewal(Boolean allowRenewal)
+ - Atualiza permissão de renovação de empréstimo
+ - 
+LogService 
+Controle de auditoria e logs do sistema
+public Log register(LogType type, User user, String description)
+ - Registra novo log no sistema
+ - Valida tipo, usuário e descrição
+ - public Log findById(Long id)
+ - Busca log por id
+ - public List<Log> findByUser(User user)
+ - Lista logs de um usuário
+ - public List<Log> findByType(LogType type)
+ - Lista logs por tipo
+ - public List<Log> findByUserAndType(User user, LogType type)
+ - Lista logs de um usuário por tipo
+ - public List<Log> findByPeriod(Instant start, Instant end)
+ - Busca logs entre datas
+ - Valida período informado
+ - public List<Log> findAllOrdered()
+ - Lista logs ordenados do mais recente para o mais antigo
+ - 
+UserService 
+Controle de usuários do sistema
+public User createUser(User user, User createdBy)
+ - Cadastra novo usuário
+ - Verifica username duplicado
+ - Verifica e-mail duplicado
+ - Valida permissões de criação
+ - Registra log de criação
+ - public User updateUser(Long id, String name, String email, String phone, User updatedBy)
+ - Atualiza dados básicos do usuário
+ - Verifica e-mail duplicado
+ - Registra log de atualização
+ - public User changeUserRole(Long id, UserRole newRole, User changedBy)
+ - Altera role do usuário
+ - Apenas ADMIN pode alterar role
+ - Registra log de alteração de role
+ - public User deactivateUser(Long id, User deactivatedBy)
+ - Inativa usuário
+ - Impede inativação com empréstimo ativo
+ - Registra log de inativação
+ - public User reactivateUser(Long id, User reactivatedBy)
+ - Reativa usuário
+ - Registra log de reativação
+ - public User findById(Long id)
+ - Busca usuário por id
+ - public User findByEmail(String email)
+ - Busca usuário por e-mail
+ - public User findByUsername(String username)
+ - Busca usuário por username
+ - public List<User> findByName(String name)
+ - Busca usuários por nome
+ - public List<User> findByStatus(UserStatus status)
+ - Lista usuários por status
+ - public List<User> findByRole(UserRole role)
+ - Lista usuários por role
+ - public List<User> findAll()
+ - Lista todos os usuários
+ - 
+LocationService 
+Controle de localizações físicas do acervo
+public Location createLocation(Location location, User createdBy)
+ - Cria nova localização
+ - Impede localizações duplicadas
+ - Registra log de criação
+ - public Location updateLocation(Long id, String shelf, String position, User updatedBy)
+ - Atualiza localização
+ - Impede duplicidade
+ - Registra log de atualização
+ - public void deleteLocation(Long id, User deletedBy)
+ - Remove localização
+ - Impede remoção de localização em uso
+ - Registra log de remoção
+ - public Location findById(Long id)
+ - Busca localização por id
+ - public List<Location> findAll()
+ - Lista todas as localizações
+ - 
+BookService 
+Controle das obras/livros do acervo
+public Book createBook(Book book, User createdBy)
+ - Cria nova obra
+ - Registra log de criação
+ - public Book updateBook(Long id, String title, String author, String category, User updatedBy)
+ - Atualiza dados da obra
+ - Registra log de atualização
+ - public Book deactivateBook(Long id, User deactivatedBy)
+ - Inativa obra
+ - Impede inativação com exemplares emprestados
+ - Registra log de inativação
+ - public Book activateBook(Long id, User activatedBy)
+ - Reativa obra
+ - Registra log de reativação
+ - public Book findById(Long id)
+ - Busca livro por id
+ - public List<Book> findByTitle(String title)
+ - Busca livros por título
+ - public List<Book> findByAuthor(String author)
+ - Busca livros por autor
+ - public List<Book> findByCategory(String category)
+ - Busca livros por categoria
+ - public List<Book> findActiveBooks()
+ - Lista livros ativos
+ - public List<Book> findInactiveBooks()
+ - Lista livros inativos
+ - public List<Book> findAll()
+ - Lista todos os livros
+ - 
+BookCopyService 
+Controle dos exemplares físicos do acervo
+public BookCopy createBookCopy(Long bookId, Long locationId, String code, User createdBy)
+ - Cria novo exemplar físico
+ - Impede códigos duplicados
+ - Valida livro e localização
+ - Registra log de criação
+ - public BookCopy updateLocation(Long id, Long locationId, User updatedBy)
+ - Atualiza localização do exemplar
+ - Impede alteração em exemplar emprestado
+ - Registra log de atualização
+ - public void deleteBookCopy(Long id, User deletedBy)
+ - Remove exemplar físico
+ - Impede remoção de exemplar emprestado
+ - Registra log de remoção
+ - public BookCopy findById(Long id)
+ - Busca exemplar por id
+ - public BookCopy findByCode(String code)
+ - Busca exemplar por código
+ - public List<BookCopy> findByBook(Book book)
+ - Lista exemplares de um livro
+ - public List<BookCopy> findByLocation(Location location)
+ - Lista exemplares por localização
+ - public List<BookCopy> findAvailableCopies()
+ - Lista exemplares disponíveis
+ - public List<BookCopy> findLoanedCopies()
+ - Lista exemplares emprestados
+ - public List<BookCopy> findAll()
+ - Lista todos os exemplares
+ - 
+LoanItemService 
+Controle individual dos itens do empréstimo
+public LoanItem returnBook(Long loanItemId, Long locationId, String observation, User handledBy)
+ - Realiza devolução de exemplar
+ - Valida se exemplar já foi devolvido
+ - Atualiza localização do exemplar
+ - Registra devolução
+ - Fecha empréstimo automaticamente quando todos os itens forem devolvidos
+ - Permite observação final do empréstimo
+ - Registra log de encerramento
+ - public LoanItem findById(Long id)
+ - Busca item do empréstimo por id
+ - public List<LoanItem> findByLoan(Loan loan)
+ - Lista itens de um empréstimo
+ - public List<LoanItem> findReturnedItems()
+ - Lista itens devolvidos
+ - public List<LoanItem> findPendingItems()
+ - Lista itens ainda emprestados
+ - public List<LoanItem> findAll()
+ - Lista todos os itens de empréstimo
+ - 
+LoanService 
+Controle geral dos empréstimos
+public Loan createLoan(Long userId, List<Long> bookCopyIds, User handledBy)
+ - Cria novo empréstimo
+ - Valida usuário
+ - Valida permissão do responsável
+ - Valida limite máximo de livros por empréstimo
+ - Verifica disponibilidade dos exemplares
+ - Cria LoanItems automaticamente
+ - Calcula data de vencimento
+ - Registra logs de empréstimo e exemplares emprestados
+ - public Loan updateObservation(Long loanId, String observation, User updatedBy)
+ - Atualiza observação administrativa do empréstimo
+ - Registra log de atualização
+ - public Loan findById(Long id)
+ - Busca empréstimo por id
+ - public Loan findActiveLoanByUser(User user)
+ - Busca empréstimo ativo do usuário
+ - public List<Loan> findByUser(User user)
+ - Lista empréstimos do usuário
+ - public List<Loan> findByStatus(LoanStatus status)
+ - Lista empréstimos por status
+ - public List<Loan> findOverdueLoans()
+ - Lista empréstimos atrasados
+ - public List<Loan> findAll()
+ - Lista todos os empréstimos
 
-- Permissões
-- - Verificar se usuário pode operar sistema
-- - Verificar se usuário pode realizar empréstimo
-- - Verificar se usuário pode alterar roles
-- - Verificar se STAFF pode criar apenas USER
-- - Verificar se usuário pode visualizar logs
-- - Atualização
-- - Atualizar dados cadastrais
-- - Alterar role do usuário
-- - Registrar data de atualização
-
-- Status
-- - Verificar se usuário está ativo
-- - Permitir inativação de usuário
-- - Impedir inativação com empréstimo ativo
-- - Permitir reativação de usuário
-
-- Consultas
-- - Buscar usuário por e-mail
-- - Buscar usuário por username
-- - Buscar usuário por nome
-- - Listar usuários ativos
-- - Listar usuários inativos
-- - Listar usuários por role
-
-BookService
-- Cadastro
-- - Verificar título obrigatório
-- - Verificar autor obrigatório
-- - Criar obra/livro
-- - Registrar livro ativo
-
-- Controle
-- - Atualizar dados do livro
-- - Ativar livro
-- - Inativar livro
-- - Verificar existência de exemplares
-- - Verificar disponibilidade de exemplares
-
-- Integridade
-- - Impedir exclusão/inativação de livro com empréstimo ativo
-- - Verificar existência de exemplares emprestados
-
-- - Consultas
-- - Buscar por título
-- - Buscar por autor
-- - Buscar por categoria
-- - Buscar por título e autor
-
-BookCopyService
-- Cadastro
-- - Verificar código único do exemplar
-- - Associar exemplar ao livro
-- - Associar localização inicial
-- - Definir status inicial AVAILABLE
-- - Controle de empréstimo
-- - Verificar se exemplar está disponível
-- - Marcar exemplar como emprestado
-- - Alterar status para LOANED
-- - Remover localização enquanto emprestado
-- - Controle de devolução
-- - Marcar exemplar como devolvido
-- - Alterar status para AVAILABLE
-- - Atualizar localização física
-
-- Controle
-- - Atualizar dados do exemplar
-- - Alterar localização do exemplar
-
-- Consultas
-- - Buscar exemplar por código
-- - Buscar exemplares disponíveis
-- - Buscar exemplares emprestados
-- - Buscar exemplares de um livro
-- - Buscar exemplares por localização
-
-LocationService
-- Cadastro
-- - Verificar estante obrigatória
-- - Verificar posição obrigatória
-- - Verificar combinação única shelf + position
-
-- Controle
-- - Atualizar dados da localização
-- - Gerar representação textual da localização
-
-- Integridade
-- - Impedir exclusão de localização em uso
-- - Verificar existência de exemplares associados
-
-- Consultas
-- - Buscar localização por estante e posição
-- - Listar localizações ordenadas
-
-LoanService
-- - Criação de empréstimo
-- - Verificar se usuário existe
-- - Verificar se usuário está ativo
-- - Verificar se usuário já possui empréstimo aberto
-- - Verificar quantidade máxima de livros permitida
-- - Verificar se lista de livros foi informada
-- - Verificar se todos exemplares estão disponíveis
-- - Criar empréstimo
-- - Registrar funcionário responsável
-- - Definir data do empréstimo
-- - Calcular data limite
-- - Definir status OPEN
-
-- Controle de empréstimo
-- - Adicionar itens ao empréstimo
-- - Associar exemplares ao empréstimo
-- - Marcar exemplares como emprestados
-
-- Controle de atraso
-- - Verificar se empréstimo está atrasado
-- - Ignorar atraso se loanDaysLimit = 0
-- - Identificar itens pendentes atrasados
-- - Listar empréstimos atrasados
-- - Listar livros atrasados
-
-- Controle de devolução
-- - Permitir devolução individual por item
-- - Verificar se item já foi devolvido
-- - Registrar data de devolução
-- - Registrar funcionário responsável pela devolução
-- - Atualizar status do exemplar
-- - Atualizar localização do exemplar
-- - Verificar se todos itens foram devolvidos
-- - Encerrar empréstimo automaticamente
-- - Alterar status para CLOSED
-
-- Renovação
-- - Verificar se renovação é permitida
-- - Renovar prazo do empréstimo
-
-- Consultas
-- - Buscar empréstimo ativo do usuário
-- - Buscar histórico de empréstimos do usuário
-- - Buscar empréstimos abertos
-- - Buscar empréstimos fechados
-- - Buscar empréstimos atrasados
-
-LoanItemService
-- Controle
-- - Associar exemplar ao empréstimo
-- - Registrar devolução individual
-- - Verificar se item já foi devolvido
-- - Impedir devolução duplicada
-
-- Consultas
-- - Buscar itens do empréstimo
-- - Buscar itens devolvidos
-- - Buscar itens pendentes
-
-ConfigurationService
-- Inicialização
-- - Criar configuração padrão na primeira execução do sistema
-
-- Controle
-- - Atualizar maxBooksPerLoan
-- - Atualizar loanDaysLimit
-- - Atualizar allowRenewal
-
-- Validações
-- - Verificar valores negativos
-- - Validar limites mínimos
-- - Validar consistência das configurações
-
-- Persistência
-- - Garantir configuração única do sistema
-
-- Consultas
-- - Buscar configuração atual do sistema
-
-LogService
-- Registro
-- - Registrar criação de usuário
-- - Registrar atualização de usuário
-- - Registrar alteração de role
-- - Registrar inativação de usuário
-- - Registrar cadastro de livro
-- - Registrar atualização de livro
-- - Registrar cadastro de exemplar
-- - Registrar alteração de exemplar
-- - Registrar alteração de localização
-- - Registrar criação de empréstimo
-- - Registrar devolução de item
-- - Registrar encerramento de empréstimo
-- - Registrar alteração de configuração
-- - Registrar login
-- - Registrar operações importantes do sistema
-
-- Segurança
-- - Permitir visualização apenas para ADMIN
-
-- Consultas
-- - Buscar logs por usuário
-- - Buscar logs por tipo
-- - Buscar logs por período
-- - Buscar logs ordenados do mais recente
-
-AuthService
-- Login
-- - Verificar existência do e-mail
-- - Verificar se usuário está ativo
-- - Autenticar usuário
-- - Registrar login no sistema
-
-- Sessão
-- - Manter usuário autenticado
-- - Encerrar sessão/logout
-
-ReportService
-- Relatório de usuário
-- - Quantidade total de usuários
-- - Quantidade de usuários ativos
-- - Quantidade de usuários inativos
-- - Quantidade de usuários por role
-- - Usuários com empréstimo ativo
-- - Usuários com maior número de empréstimos
-
-- Relatórios de acervo
-- - Quantidade total de livros
-- - Quantidade total de exemplares
-- - Quantidade de autores
-- - Livros por categoria
-- - Livros por localização
-
-- Relatórios de empréstimos
-- - Livros emprestados
-- - Livros disponíveis
-- - Empréstimos abertos
-- - Empréstimos fechados
-- - Livros atrasados
-- - Histórico de empréstimos
-- - Usuários com maior número de empréstimos
-
-- Relatórios avançados
-- - Frequência de empréstimos por período
-- - Ranking de autores mais lidos

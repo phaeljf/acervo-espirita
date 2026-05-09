@@ -44,6 +44,9 @@ public class Loan implements Serializable {
 
     private LocalDate dueDate;
 
+    @Column(length = 1000)
+    private String observation;
+
     @Builder
     public Loan(User user, User handledBy) {
         if (user == null){
@@ -74,15 +77,22 @@ public class Loan implements Serializable {
         return dueDate != null && LocalDate.now().isAfter(dueDate);
     }
 
-    public void close() {
-        this.status = LoanStatus.CLOSED;
-    }
-
     public boolean isActive() {
         return status == LoanStatus.OPEN;
     }
 
+    public void updateObservation(String observation) {
+        this.observation = observation;
+    }
 
+    public boolean hasObservation() {
+        return observation != null && !observation.isBlank();
+    }
+
+    public void close(String observation) {
+        this.status = LoanStatus.CLOSED;
+        this.observation = observation;
+    }
 
     //Equals e Hashcode
 

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Login')}"></head>
+
+<body class="bg-light">
+
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+    <div class="card shadow-sm p-4" style="width: 600px;">
+        <div class="d-flex align-items-center justify-content-center gap-4 mb-4">
+            <img src="/img/logo.jpg" alt="GEAL" width="120">
+            <div>
+                <h1 class="fw-bold text-primary mb-2"> GEAL </h1>
+                <p class="text-muted mb-1"> Grupo Espírita André Luiz </p>
+                <p class="text-muted mb-0"> Conselheiro Lafaiete </p>
+            </div>
+        </div>
+
+        <form action="/login" method="post">
+            <div class="mb-3">
+                <label class="form-label"> Usuário </label>
+                <input type="text" name="username" class="form-control" placeholder="Digite seu usuário" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100"> Entrar </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

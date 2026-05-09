@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Dashboard')}"></head>
+
+<body class="bg-light">
+
+<div class="d-flex">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- CONTEÚDO -->
+    <div class="flex-grow-1 p-4">
+
+        <h1 class="mb-4">
+            Dashboard
+        </h1>
+
+        <div class="row">
+
+            <div class="col-md-3 mb-3">
+
+                <div class="card shadow-sm">
+
+                    <div class="card-body">
+
+                        <h5>Total de Livros</h5>
+
+                        <h2>0</h2>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

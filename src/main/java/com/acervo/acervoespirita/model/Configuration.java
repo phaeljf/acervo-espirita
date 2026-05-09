@@ -19,8 +19,8 @@ public class Configuration implements Serializable {
     @Setter(AccessLevel.NONE)
     private Long id = 1L;
 
-    private Integer maxBooksPerLoan = 3;
-    private Integer loanDaysLimit = 0;
+    private Integer maxBooksPerLoan = 99;
+    private Integer loanDaysLimit = 60;
     private Boolean allowRenewal = true;
 
     public Configuration(Integer maxBooksPerLoan, Integer loanDaysLimit, Boolean allowRenewal) {

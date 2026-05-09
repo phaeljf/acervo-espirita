@@ -1,5 +1,6 @@
 package com.acervo.acervoespirita.repository;
 
+import com.acervo.acervoespirita.model.Book;
 import com.acervo.acervoespirita.model.BookCopy;
 import com.acervo.acervoespirita.model.Loan;
 import com.acervo.acervoespirita.model.LoanItem;
@@ -27,4 +28,9 @@ public interface LoanItemRepository extends JpaRepository<LoanItem, Long> {
             Loan loan,
             BookCopy bookCopy
     );
+
+    LoanItem save(LoanItem loanItem);
+
+    boolean existsByBookCopyBook(Book book);
+
 }

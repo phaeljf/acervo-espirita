@@ -1,551 +1,724 @@
-📚 Resumo das Classes Criadas — Sistema de Gerenciamento de Acervo Espírita
-🧍 User
-Representa os usuários do sistema.
-Responsabilidades:
+package com.acervo.acervoespirita.model;
+
+import com.acervo.acervoespirita.model.enums.UserRole;
+import com.acervo.acervoespirita.model.enums.UserStatus;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
+@Entity
+@Table(name="users")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString(exclude = {"loans"})
+public class User implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String name;
+
+    @Column(unique = true, nullable = false)
+    @Setter(AccessLevel.NONE)
+    private String username;
+
+    // Tanto o email como phone podem estar vazio sao dados so para contatos
+    @Email
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    private String phone;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Setter(AccessLevel.NONE)
+    private UserRole role;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @Setter(AccessLevel.NONE) //Nao permite setar uma nova lista de emprestimos, vai precisar add novos emprestimos na lista ja existente
+    private List<Loan> loans = new ArrayList<>();
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
+
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @Column(nullable = false)
+    private Instant updatedAt;
+
+    @Builder
+    public User(String name, String email, String username, String phone, UserRole role) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("É necessário informar o nome!");
+        }
+
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("É necessário informar o Usuário!");
+        }
+
+        if (role == null) {
+            throw new IllegalArgumentException("É necessário informar o função do usuário!");
+        }
+
+        this.name = name;
+        this.email = email;
+        this.username = username;
+        this.phone = phone;
+        this.role = role;
+        this.status = UserStatus.ACTIVE;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
+    //Métodos criados
+
+    //Metodos sobre o Usuario
+    public boolean isActive() {
+        return status == UserStatus.ACTIVE;
+    }
+
+    public void deactivate() {
+        if (hasActiveLoan()) {
+            throw new IllegalStateException("Erro ao Inativar: Usuário tem um empréstimo ativo!");
+        }
+        this.status = UserStatus.INACTIVE;
+    }
+
+    public boolean isAdmin() {
+        return role == UserRole.ADMIN;
+    }
+
+    public boolean isStaff() {
+        return role == UserRole.STAFF;
+    }
+
+    public void changeRole(UserRole newRole) {
+        if (newRole == null) {
+            throw new IllegalArgumentException("Role inválida");
+        }
+        this.role = newRole;
+    }
+
+    @PreUpdate
+    public void updateTime() {
+        updatedAt = Instant.now();
+    }
+
+    public boolean canHandleLoan() {
+        return role == UserRole.STAFF || role == UserRole.ADMIN;
+    }
+
+    //Metodos sobre Emrpestimos
+
+    public boolean canBorrow() {
+        return isActive() && !hasActiveLoan();
+    }
+
+    public void addLoan(Loan loan) {
+        loans.add(loan);
+        loan.setUser(this);
+    }
+
+    public List<Loan> getLoans() {
+        return Collections.unmodifiableList(loans);
+    }
+
+    public boolean hasActiveLoan() {
+        return loans.stream().anyMatch(Loan::isActive);
+    }
+
+    public Loan getActiveLoan() {
+        return loans.stream()
+                .filter(Loan::isActive)
+                .findFirst()
+                .orElse(null);
+    }
+
+
+}
+
+package com.acervo.acervoespirita.model;
+
+import com.acervo.acervoespirita.model.enums.LogType;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+@Entity
+@Table(name = "logs")
+@Setter
+@Getter
+@ToString(exclude = {"user"})
+@NoArgsConstructor
+public class Log implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private LogType type;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(nullable = false)
+    private Instant dateTime;
+
+    @Column(nullable = false)
+    private String description;
+
+    @Builder
+    public Log(LogType type, User user, String description) {
+        this.type = type;
+        this.user = user;
+        this.dateTime = Instant.now();
+        this.description = description;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Log log = (Log) o;
+        return Objects.equals(id, log.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+}
+
+package com.acervo.acervoespirita.model;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+@Entity
+@Table(name = "locations", uniqueConstraints = {@UniqueConstraint(columnNames = {"shelf", "position"})})
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
+public class Location implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String shelf;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String position;
+
+    public Location(String shelf, String position) {
+        if (shelf == null || shelf.isBlank()) {
+            throw new IllegalArgumentException("Estante não pode ser vazia");
+        }
+        if (position == null || position.isBlank()) {
+            throw new IllegalArgumentException("Prateleira não pode ser vazia");
+        }
+
+        this.shelf = shelf.trim().toUpperCase();
+        this.position = position.trim().toUpperCase();
+    }
+
+    // tratamento da criação de estante
+
+    public String getLocation() {
+        return shelf + position;
+    }
+
+    // Equals hashcode
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Location)) return false;
+        Location other = (Location) o;
+
+        return shelf.equals(other.shelf)
+                && position.equals(other.position);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(shelf, position);
+    }
+}
+
+
+package com.acervo.acervoespirita.model;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@Entity
+@Table(name = "loan_items")
+@Getter
+@NoArgsConstructor
+@ToString(exclude = {"loan", "bookCopy"})
+public class LoanItem implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "loan_id", nullable = false)
+    private Loan loan;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "book_copy_id", nullable = false)
+    private BookCopy bookCopy;
+
+    private LocalDate returnDate;
+
+    public LoanItem(Loan loan, BookCopy bookCopy) {
+        if (loan == null) {
+            throw new IllegalArgumentException("Loan é obrigatório");
+        }
+        if (bookCopy == null) {
+            throw new IllegalArgumentException("BookCopy é obrigatório");
+        }
+
+        this.loan = loan;
+        this.bookCopy = bookCopy;
+
+        bookCopy.markAsLoaned();
+    }
+
+    //Comportamento
+
+
+    public boolean isReturned() {
+        return returnDate != null;
+    }
+
+    public void markAsReturned(Location location) {
+        if (isReturned()) {
+            throw new IllegalStateException("Livro já devolvido");
+        }
+        this.returnDate = LocalDate.now();
+        this.bookCopy.markAsReturned(location);
+    }
+
+
+
+    // Equals Hashcode
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        LoanItem loanItem = (LoanItem) o;
+        return Objects.equals(id, loanItem.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+}
+
+
+package com.acervo.acervoespirita.model;
+
+import com.acervo.acervoespirita.model.enums.LoanStatus;
+import com.acervo.acervoespirita.model.enums.UserStatus;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@Entity
+@Table(name="loans")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@ToString(exclude = {"handledBy","user","items"})
+public class Loan implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @Setter(AccessLevel.PACKAGE)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "handled_by_id", nullable = false)
+    private User handledBy;
+
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LoanItem> items = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private LoanStatus status;
+
+    private Instant loanDate;
+
+    private LocalDate dueDate;
+
+    @Column(length = 1000)
+    private String observation;
+
+    @Builder
+    public Loan(User user, User handledBy) {
+        if (user == null){
+            throw new IllegalArgumentException("É necessário informar o usuário!");
+        }
+        if (handledBy == null){
+            throw new IllegalArgumentException("É necessário informar o  trabalhador!");
+        }
+
+        this.user = user;
+        this.handledBy = handledBy;
+        this.loanDate = Instant.now();
+        this.status = LoanStatus.OPEN;
+    }
+
+
+    //Comportamento
+    public void calculateDueDate(Configuration config) {
+        if (config == null || config.getLoanDaysLimit() == 0) {
+            this.dueDate = LocalDate.of(2099, 12, 31);
+        } else {
+            // Usa a data do empréstimo (convertida para LocalDate) como base
+            this.dueDate = LocalDate.now().plusDays(config.getLoanDaysLimit());
+        }
+    }
+
+    public boolean isOverdue() {
+        return dueDate != null && LocalDate.now().isAfter(dueDate);
+    }
+
+    public boolean isActive() {
+        return status == LoanStatus.OPEN;
+    }
+
+    public void updateObservation(String observation) {
+        this.observation = observation;
+    }
+
+    public boolean hasObservation() {
+        return observation != null && !observation.isBlank();
+    }
+
+    public void close(String observation) {
+        this.status = LoanStatus.CLOSED;
+        this.observation = observation;
+    }
+
+    //Equals e Hashcode
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Loan loan = (Loan) o;
+        return Objects.equals(id, loan.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+}
+
+
+package com.acervo.acervoespirita.model;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.*;
+
+import java.io.Serializable;
+
+@Entity
+@Table(name="configurations")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
+public class Configuration implements Serializable {
+
+    @Id
+    @Setter(AccessLevel.NONE)
+    private Long id = 1L;
+
+    private Integer maxBooksPerLoan = 99;
+    private Integer loanDaysLimit = 60;
+    private Boolean allowRenewal = true;
+
+    public Configuration(Integer maxBooksPerLoan, Integer loanDaysLimit, Boolean allowRenewal) {
+        this.id = 1L;
+        this.maxBooksPerLoan = maxBooksPerLoan;
+        this.loanDaysLimit = loanDaysLimit;
+        this.allowRenewal = allowRenewal;
+    }
+
+}
+
+package com.acervo.acervoespirita.model;
+
+import com.acervo.acervoespirita.model.enums.BookStatus;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+@Entity
+@Table(name = "book_copies")
+@Getter
+@NoArgsConstructor
+@ToString(exclude = {"book", "location"})
+public class BookCopy implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id", nullable = false)
+    @Setter(AccessLevel.PACKAGE)
+    private Book book;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
+    private Location location;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private BookStatus status;
+
+    @Column(nullable = false, unique = true)
+    private String code;
+
+    @Builder
+    public BookCopy(Book book, BookStatus status, Location location, String code) {
+        if (book == null) {
+            throw new IllegalArgumentException("Livro é obrigatório");
+        }
+        if (code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Código da cópia é obrigatório");
+        }
+
+        this.book = book;
+        this.location = location;
+        this.code = code.trim().toUpperCase();
+        this.status = BookStatus.AVAILABLE;
+    }
+
+    // Metodo de verificação
+
+    public boolean isAvailable() {
+        return status == BookStatus.AVAILABLE;
+    }
+
+    public void markAsLoaned() {
+        if (!isAvailable()) {
+            throw new IllegalStateException("Cópia não está disponível");
+        }
+        this.status = BookStatus.LOANED;
+        this.location = null;
+    }
+
+    public void markAsReturned(Location location) {
+        if (location == null) {
+            throw new IllegalArgumentException("Localização obrigatória");
+        }
+
+        this.status = BookStatus.AVAILABLE;
+        this.location = location;
+    }
+
+    public void updateLocation(Location location) {
+        this.location = location;
+    }
+
+    // Equals hashcode
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        BookCopy bookCopy = (BookCopy) o;
+        return Objects.equals(id, bookCopy.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+}
+
+
+package com.acervo.acervoespirita.model;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
+
+import java.io.Serializable;
+import java.util.*;
+
+@Entity
+@Table(name = "books")
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
+public class Book implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String title;
+
+    @NotBlank
+    @Column(nullable = false)
+    private String author;
+
+    @Column
+    private String category;
+
+    @Column(nullable = false)
+    private boolean active;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Setter(AccessLevel.NONE)
+    private List<BookCopy> copies = new ArrayList<>();
+
+    public Book(String title, String author) {
+        if (title == null || title.isBlank()) {
+            throw new IllegalArgumentException("Título da obra não pode ser em branco");
+        }
+        if (author == null || author.isBlank()) {
+            throw new IllegalArgumentException("Nome do Autor não pode ser em branco");
+        }
+
+        this.title = title;
+        this.author = author;
+        this.active = true;
+    }
+
+    // Controle da relacionamento
+    public void addCopy(BookCopy copy) {
+        copies.add(copy);
+        copy.setBook(this);
+    }
+
+    public void removeCopy(BookCopy copy) {
+        copies.remove(copy);
+        copy.setBook(null);
+    }
+
+    public List<BookCopy> getCopies() {
+        return Collections.unmodifiableList(copies);
+    }
+
+    // Controle do Livro
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void deactivate() {
+        this.active = false;
+    }
+
+    public void activate() {
+        this.active = true;
+    }
+
+    // Controle de cópias
+    public boolean hasCopies() {
+        return !copies.isEmpty();
+    }
+
+    public long getTotalCopies() {
+        return copies.size();
+    }
+
+    public long getAvailableCopies() {
+        return copies.stream()
+                .filter(BookCopy::isAvailable)
+                .count();
+    }
+
+    public boolean hasAvailableCopies() {
+        return getAvailableCopies() > 0;
+    }
+
+    // equals e hashCode por ID (boa prática JPA)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Book)) return false;
+        Book other = (Book) o;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+}
 
-
-Armazenar dados cadastrais:
-
-
-nome
-
-
-username
-
-
-email
-
-
-telefone
-
-
-role
-
-
-status
-
-
-
-
-Controlar permissões:
-
-
-USER
-
-
-STAFF
-
-
-ADMIN
-
-
-
-
-Controlar status do usuário:
-
-
-ACTIVE
-
-
-INACTIVE
-
-
-
-
-Gerenciar empréstimos vinculados ao usuário
-
-
-Verificar:
-
-
-se está ativo
-
-
-se possui empréstimo ativo
-
-
-se pode realizar empréstimos
-
-
-se pode operar o sistema
-
-
-
-
-Permitir alteração controlada de role
-
-
-Impedir inativação com empréstimo ativo
-
-
-Registrar datas de criação e atualização
-
-
-
-📖 Book
-Representa a obra/livro abstrato do acervo.
-Responsabilidades:
-
-
-Armazenar:
-
-
-título
-
-
-autor
-
-
-categoria
-
-
-
-
-Controlar ativação/desativação do livro
-
-
-Gerenciar lista de cópias físicas (BookCopy)
-
-
-Verificar:
-
-
-quantidade total de cópias
-
-
-quantidade disponível
-
-
-existência de cópias disponíveis
-
-
-
-
-Manter relacionamento bidirecional com BookCopy
-
-
-
-📚 BookCopy
-Representa um exemplar físico individual de um livro.
-Responsabilidades:
-
-
-Armazenar:
-
-
-código único
-
-
-status do exemplar
-
-
-localização física
-
-
-
-
-Relacionar exemplar ao Book
-
-
-Controlar status:
-
-
-AVAILABLE
-
-
-LOANED
-
-
-
-
-Marcar exemplar como:
-
-
-emprestado
-
-
-devolvido
-
-
-
-
-Atualizar localização física
-
-
-Remover localização enquanto emprestado
-
-
-
-🏷️ Location
-Representa a localização física de um exemplar no acervo.
-Responsabilidades:
-
-
-Armazenar:
-
-
-estante
-
-
-posição/prateleira
-
-
-
-
-Garantir combinação única:
-
-
-shelf + position
-
-
-
-
-Gerar representação textual da localização
-
-
-Validar preenchimento dos dados
-
-
-
-📦 Loan
-Representa um empréstimo realizado no sistema.
-Responsabilidades:
-
-
-Relacionar:
-
-
-usuário que recebeu empréstimo
-
-
-funcionário responsável
-
-
-
-
-Controlar:
-
-
-data do empréstimo
-
-
-data limite
-
-
-status do empréstimo
-
-
-
-
-Gerenciar lista de itens emprestados (LoanItem)
-
-
-Calcular data de devolução com base em Configuration
-
-
-Verificar atraso do empréstimo
-
-
-Encerrar empréstimo
-
-
-Verificar se empréstimo está ativo
-
-
-Status:
-
-
-OPEN
-
-
-CLOSED
-
-
-
-📄 LoanItem
-Representa um item individual dentro de um empréstimo.
-Responsabilidades:
-
-
-Relacionar:
-
-
-empréstimo
-
-
-exemplar físico (BookCopy)
-
-
-
-
-Controlar devolução individual
-
-
-Registrar data de devolução
-
-
-Marcar exemplar como devolvido
-
-
-Verificar se item já foi devolvido
-
-
-
-⚙️ Configuration
-Representa as configurações globais do sistema.
-Responsabilidades:
-
-
-Armazenar:
-
-
-quantidade máxima de livros por empréstimo
-
-
-limite de dias de empréstimo
-
-
-permissão de renovação
-
-
-
-
-Manter configuração persistente única do sistema
-
-
-Configurações:
-
-
-maxBooksPerLoan
-
-
-loanDaysLimit
-
-
-allowRenewal
-
-
-
-📜 Log
-Representa registros de auditoria do sistema.
-Responsabilidades:
-
-
-Registrar:
-
-
-tipo da operação
-
-
-usuário responsável
-
-
-data/hora
-
-
-descrição da ação
-
-
-
-
-Permitir rastreamento de alterações e operações
-
-
-
-🎭 Enums Criados
-👤 UserRole
-Define permissões do usuário:
-
-
-USER
-
-
-STAFF
-
-
-ADMIN
-
-
-
-🚦 UserStatus
-Define status do usuário:
-
-
-ACTIVE
-
-
-INACTIVE
-
-
-
-📚 BookStatus
-Define status do exemplar:
-
-
-AVAILABLE
-
-
-LOANED
-
-
-
-📦 LoanStatus
-Define status do empréstimo:
-
-
-OPEN
-
-
-CLOSED
-
-
-
-📜 LogType
-Define tipos de logs do sistema:
-Usuários
-
-
-USER_CREATED
-
-
-USER_UPDATED
-
-
-USER_DELETED
-
-
-Livros
-
-
-BOOK_CREATED
-
-
-BOOK_UPDATED
-
-
-BOOK_DELETED
-
-
-Exemplares
-
-
-BOOK_COPY_CREATED
-
-
-BOOK_COPY_UPDATED
-
-
-BOOK_COPY_DELETED
-
-
-Localizações
-
-
-LOCATION_CREATED
-
-
-LOCATION_UPDATED
-
-
-LOCATION_DELETED
-
-
-Empréstimos
-
-
-BOOK_LOANED
-
-
-BOOK_RETURNED
-
-
-LOAN_CREATED
-
-
-LOAN_CLOSED
-
-
-Configuração
-
-
-CONFIGURATION_UPDATED
-
-
-
-🧠 Estrutura Atual do Sistema
-Relacionamentos principais
-User
-
-
-1:N Loan
-
-
-Loan
-
-
-1:N LoanItem
-
-
-LoanItem
-
-
-N:1 BookCopy
-
-
-Book
-
-
-1:N BookCopy
-
-
-BookCopy
-
-
-N:1 Location
-
-
-
-✅ Funcionalidades já implementadas no domínio
-
-
-Controle de usuários
-
-
-Controle de permissões
-
-
-Controle de status
-
-
-Controle de empréstimos
-
-
-Devolução individual de livros
-
-
-Controle de exemplares físicos
-
-
-Controle de localização física
-
-
-Controle de disponibilidade
-
-
-Regras de empréstimo
-
-
-Auditoria/logs
-
-
-Configuração persistente do sistema
-
-
-Relacionamentos JPA
-
-
-Métodos de domínio ricos
-
-
-Proteção parcial contra inconsistências de domínio
 

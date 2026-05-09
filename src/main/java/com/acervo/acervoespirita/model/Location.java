@@ -10,6 +10,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "locations", uniqueConstraints = {@UniqueConstraint(columnNames = {"shelf", "position"})})
 @Getter
+@Setter
 @NoArgsConstructor
 @ToString
 public class Location implements Serializable {
@@ -41,7 +42,7 @@ public class Location implements Serializable {
     // tratamento da criação de estante
 
     public String getLocation() {
-        return shelf + " - " + position;
+        return shelf + position;
     }
 
     // Equals hashcode
