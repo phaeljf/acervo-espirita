@@ -35,7 +35,7 @@ public class BookCopy implements Serializable {
     private String code;
 
     @Builder
-    public BookCopy(Book book, BookStatus status, Location location, String code) {
+    public BookCopy(Book book, Location location, String code) {
         if (book == null) {
             throw new IllegalArgumentException("Livro é obrigatório");
         }

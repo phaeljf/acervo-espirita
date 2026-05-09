@@ -31,11 +31,9 @@ public class Location implements Serializable {
         if (shelf == null) {
             throw new IllegalArgumentException("Estante não pode ser vazia");
         }
-
         if (shelfPosition == null) {
             throw new IllegalArgumentException("Prateleira não pode ser vazia");
         }
-
         if (shelfPosition.getShelf() == null || !shelfPosition.getShelf().equals(shelf)) {
             throw new IllegalArgumentException("Prateleira não pertence à estante informada");
         }
@@ -53,13 +51,9 @@ public class Location implements Serializable {
     // Equals and HashCode
     @Override
     public boolean equals(Object o) {
-
         if (this == o) return true;
-
         if (!(o instanceof Location)) return false;
-
         Location other = (Location) o;
-
         return Objects.equals(shelf, other.shelf)
                 && Objects.equals(shelfPosition, other.shelfPosition);
     }
