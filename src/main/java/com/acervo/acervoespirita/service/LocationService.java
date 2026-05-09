@@ -1,6 +1,8 @@
 package com.acervo.acervoespirita.service;
 
 import com.acervo.acervoespirita.model.Location;
+import com.acervo.acervoespirita.model.Shelf;
+import com.acervo.acervoespirita.model.ShelfPosition;
 import com.acervo.acervoespirita.model.User;
 import com.acervo.acervoespirita.model.enums.LogType;
 import com.acervo.acervoespirita.repository.BookCopyRepository;
@@ -19,79 +21,54 @@ public class LocationService {
     private final BookCopyRepository bookCopyRepository;
     private final LogService logService;
 
-    // Cria uma nova localização
     @Transactional
     public Location createLocation(Location location, User createdBy) {
 
-        if (locationRepository.existsByShelfAndPosition(location.getShelf(), location.getPosition())) {
-            throw new IllegalArgumentException("Já existe uma localização com essa estante e posição.");
+        if (locationRepository.existsByShelfAndShelfPosition(location.getShelf(), location.getShelfPosition())) {
+            throw new IllegalArgumentException("Já existe uma localização com essa estante e prateleira.");
         }
 
         Location savedLocation = locationRepository.save(location);
-        logService.register(LogType.LOCATION_CREATED, createdBy,"Localização "
-                                                                + savedLocation.getShelf()
-                                                                + "-" + savedLocation.getPosition()
-                                                                + " foi criada."
-        );
+        logService.register(LogType.LOCATION_CREATED, createdBy, "Localização " + savedLocation.getLocation() + " foi criada.");
 
         return savedLocation;
     }
 
-    // Atualiza localização
     @Transactional
-    public Location updateLocation(Long id, String shelf, String position, User updatedBy) {
+    public Location updateLocation(Long id, Shelf shelf, ShelfPosition shelfPosition, User updatedBy) {
 
         Location location = findById(id);
-        boolean locationAlreadyExists = locationRepository.existsByShelfAndPosition(shelf, position);
-
-        boolean sameLocation = location.getShelf().equals(shelf) && location.getPosition().equals(position);
+        boolean locationAlreadyExists = locationRepository.existsByShelfAndShelfPosition(shelf, shelfPosition);
+        boolean sameLocation = location.getShelf().equals(shelf) && location.getShelfPosition().equals(shelfPosition);
 
         if (locationAlreadyExists && !sameLocation) {
-            throw new IllegalArgumentException("Já existe uma localização com essa estante e posição.");
+            throw new IllegalArgumentException("Já existe uma localização com essa estante e prateleira.");
         }
 
         location.setShelf(shelf);
-        location.setPosition(position);
-
+        location.setShelfPosition(shelfPosition);
         Location updatedLocation = locationRepository.save(location);
-
-        logService.register(LogType.LOCATION_UPDATED, updatedBy,"Localização "
-                                                                + updatedLocation.getShelf()
-                                                                + "-"
-                                                                + updatedLocation.getPosition()
-                                                                + " foi atualizada."
-        );
+        logService.register(LogType.LOCATION_UPDATED, updatedBy, "Localização " + updatedLocation.getLocation() + " foi atualizada.");
 
         return updatedLocation;
     }
 
-    // Remove localização
     @Transactional
     public void deleteLocation(Long id, User deletedBy) {
 
         Location location = findById(id);
-
         if (bookCopyRepository.existsByLocation(location)) {
             throw new IllegalStateException("Não é possível remover localização em uso.");
         }
-
         locationRepository.delete(location);
-
-        logService.register(LogType.LOCATION_DELETED, deletedBy,"Localização "
-                                                                + location.getShelf()
-                                                                + "-"
-                                                                + location.getPosition()
-                                                                + " foi removida."
-        );
+        logService.register(LogType.LOCATION_DELETED, deletedBy, "Localização " + location.getLocation() + " foi removida.");
     }
 
-    // Busca localização por id
     @Transactional(readOnly = true)
     public Location findById(Long id) {
         return locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Localização não encontrada."));
     }
 
-    // Lista todas as localizações
     @Transactional(readOnly = true)
     public List<Location> findAll() {
         return locationRepository.findAll();

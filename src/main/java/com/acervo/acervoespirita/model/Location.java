@@ -1,63 +1,71 @@
 package com.acervo.acervoespirita.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "locations", uniqueConstraints = {@UniqueConstraint(columnNames = {"shelf", "position"})})
+@Table(name = "locations", uniqueConstraints = {@UniqueConstraint(columnNames = {"shelf_id", "shelf_position_id"})})
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString
+@ToString(exclude = {"shelf", "shelfPosition"})
 public class Location implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Column(nullable = false)
-    private String shelf;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shelf_id", nullable = false)
+    private Shelf shelf;
 
-    @NotBlank
-    @Column(nullable = false)
-    private String position;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shelf_position_id", nullable = false)
+    private ShelfPosition shelfPosition;
 
-    public Location(String shelf, String position) {
-        if (shelf == null || shelf.isBlank()) {
+    public Location(Shelf shelf, ShelfPosition shelfPosition) {
+
+        if (shelf == null) {
             throw new IllegalArgumentException("Estante não pode ser vazia");
         }
-        if (position == null || position.isBlank()) {
+
+        if (shelfPosition == null) {
             throw new IllegalArgumentException("Prateleira não pode ser vazia");
         }
 
-        this.shelf = shelf.trim().toUpperCase();
-        this.position = position.trim().toUpperCase();
+        if (shelfPosition.getShelf() == null || !shelfPosition.getShelf().equals(shelf)) {
+            throw new IllegalArgumentException("Prateleira não pertence à estante informada");
+        }
+
+        this.shelf = shelf;
+        this.shelfPosition = shelfPosition;
     }
 
-    // tratamento da criação de estante
+    // Métodos
 
     public String getLocation() {
-        return shelf + position;
+        return shelf.getName() + shelfPosition.getName();
     }
 
-    // Equals hashcode
+    // Equals and HashCode
     @Override
     public boolean equals(Object o) {
+
         if (this == o) return true;
+
         if (!(o instanceof Location)) return false;
+
         Location other = (Location) o;
 
-        return shelf.equals(other.shelf)
-                && position.equals(other.position);
+        return Objects.equals(shelf, other.shelf)
+                && Objects.equals(shelfPosition, other.shelfPosition);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(shelf, position);
+        return Objects.hash(shelf, shelfPosition);
     }
 }

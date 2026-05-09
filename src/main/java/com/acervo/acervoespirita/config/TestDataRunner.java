@@ -1,9 +1,6 @@
 package com.acervo.acervoespirita.config;
 
-import com.acervo.acervoespirita.model.Book;
-import com.acervo.acervoespirita.model.BookCopy;
-import com.acervo.acervoespirita.model.Location;
-import com.acervo.acervoespirita.model.User;
+import com.acervo.acervoespirita.model.*;
 import com.acervo.acervoespirita.model.enums.UserRole;
 import com.acervo.acervoespirita.repository.UserRepository;
 import com.acervo.acervoespirita.service.*;
@@ -67,21 +64,45 @@ public class TestDataRunner implements CommandLineRunner {
         );
 
         // =========================
+        // Estantes
+        // =========================
+
+        Shelf shelf1 = new Shelf("E1");
+        Shelf shelf2 = new Shelf("E2");
+        Shelf shelf3 = new Shelf("E3");
+
+        ShelfPosition p1Shelf1 = new ShelfPosition("P1");
+        ShelfPosition p2Shelf1 = new ShelfPosition("P2");
+
+        ShelfPosition p1Shelf2 = new ShelfPosition("P1");
+        ShelfPosition p2Shelf2 = new ShelfPosition("P2");
+
+        ShelfPosition p1Shelf3 = new ShelfPosition("P1");
+
+        shelf1.addPosition(p1Shelf1);
+        shelf1.addPosition(p2Shelf1);
+
+        shelf2.addPosition(p1Shelf2);
+        shelf2.addPosition(p2Shelf2);
+
+        shelf3.addPosition(p1Shelf3);
+
+        // =========================
         // Localizações
         // =========================
 
         Location location1 = locationService.createLocation(
-                new Location("E1", "P1"),
+                new Location(shelf1, p1Shelf1),
                 admin
         );
 
         Location location2 = locationService.createLocation(
-                new Location("E2", "P2"),
+                new Location(shelf2, p2Shelf2),
                 admin
         );
 
         Location location3 = locationService.createLocation(
-                new Location("E3", "P1"),
+                new Location(shelf3, p1Shelf3),
                 admin
         );
 
@@ -140,27 +161,22 @@ public class TestDataRunner implements CommandLineRunner {
         // Empréstimos
         // =========================
 
-        // Admin pega livros para ele mesmo
-                loanService.createLoan(
-                        admin.getId(),
-                        List.of(1L, 2L),
-                        admin
-                );
+        loanService.createLoan(
+                admin.getId(),
+                List.of(1L, 2L),
+                admin
+        );
 
-        // Trabalhador pega livro para ele mesmo
-                loanService.createLoan(
-                        staff.getId(),
-                        List.of(3L),
-                        staff
-                );
+        loanService.createLoan(
+                staff.getId(),
+                List.of(3L),
+                staff
+        );
 
-        // Admin empresta livro para usuário
-                loanService.createLoan(
-                        user.getId(),
-                        List.of(4L, 5L),
-                        admin
+        loanService.createLoan(
+                user.getId(),
+                List.of(4L, 5L),
+                admin
         );
     }
-
-
 }
