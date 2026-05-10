@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Sala')}"></head>
+
+<body class="bg-light">
+
+<div class="d-flex">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- CONTEÚDO -->
+    <div class="flex-grow-1 p-4">
+
+        <div th:replace="~{fragments/topbar :: topbar(${room != null && room.id != null ? 'Editar Sala' : 'Nova Sala'})}"></div>
+
+        <!-- ERRO -->
+        <div th:if="${error}" class="alert alert-danger">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- FORM -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <form th:action="@{/locations/save}" method="post">
+
+                    <input type="hidden" name="id" th:value="${room != null ? room.id : ''}">
+
+                    <!-- NOME -->
+                    <div class="mb-3">
+                        <label class="form-label">Nome da Sala</label>
+                        <input type="text" name="name" class="form-control" th:value="${room != null ? room.name : ''}">
+                    </div>
+
+                    <!-- BOTÕES -->
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <a href="/locations" class="btn btn-secondary">Cancelar</a>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

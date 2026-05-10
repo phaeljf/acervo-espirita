@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Estante')}"></head>
+
+<body class="bg-light">
+
+<div class="d-flex">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- CONTEÚDO -->
+    <div class="flex-grow-1 p-4">
+
+        <div th:replace="~{fragments/topbar :: topbar(${shelf != null && shelf.id != null ? 'Editar Estante' : 'Nova Estante'})}"></div>
+
+        <!-- ERRO -->
+        <div th:if="${error}" class="alert alert-danger">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- FORM -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <form th:action="@{/shelves/save}" method="post">
+
+                    <!-- ID -->
+                    <input type="hidden" name="id" th:value="${shelf != null ? shelf.id : ''}">
+
+                    <!-- ROOM -->
+                    <input type="hidden" name="roomId" th:value="${room.id}">
+
+                    <!-- NOME -->
+                    <div class="mb-3">
+                        <label class="form-label">Nome da Estante</label>
+                        <input type="text" name="name" class="form-control" th:value="${shelf != null ? shelf.name : ''}" placeholder="Ex: E1">
+                    </div>
+
+                    <!-- BOTÕES -->
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <a th:href="@{/shelves(roomId=${room.id})}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

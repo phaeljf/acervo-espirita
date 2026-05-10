@@ -12,21 +12,11 @@
 
         <div class="card-body text-center">
 
-            <h1 class="text-danger mb-4">
-                Erro
-            </h1>
+            <h1 class="text-danger mb-4"> Erro </h1>
 
-            <p th:text="${errorMessage}"
-               class="fs-5">
+            <p th:text="${errorMessage}" class="fs-5">
             </p>
-
-            <a href="/books"
-               class="btn btn-primary mt-3">
-
-                Voltar
-
-            </a>
-
+            <a href="javascript:history.back()" class="btn btn-primary mt-3"> Voltar </a>
         </div>
 
     </div>

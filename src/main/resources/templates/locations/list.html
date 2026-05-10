@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Localizações')}"></head>
+
+<body class="bg-light">
+
+<div class="d-flex">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- CONTEÚDO -->
+    <div class="flex-grow-1 p-4">
+
+        <div th:replace="~{fragments/topbar :: topbar('Localizações')}"></div>
+
+        <!-- TOPO -->
+        <div class="mb-4">
+
+            <div class="d-flex gap-2 mb-3">
+                <a href="/locations/new" class="btn btn-primary">Adicionar Sala</a>
+            </div>
+
+        </div>
+
+        <!-- LISTA -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <table class="table table-hover">
+
+                    <thead>
+                    <tr>
+                        <th>Sala</th>
+                        <th>Quantidade de Estantes</th>
+                        <th>Ações</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+
+                    <tr th:each="room : ${rooms}">
+                        <td th:text="${room.name}"></td>
+                        <td th:text="${room.shelves.size()}"></td>
+
+                        <!-- AÇÕES -->
+                        <td>
+
+                            <div class="d-flex gap-2">
+                                <a th:href="@{/shelves(roomId=${room.id})}" class="btn btn-sm btn-info">Entrar </a>
+                                <a th:href="@{/locations/edit/{id}(id=${room.id})}" class="btn btn-sm btn-warning"> Editar </a>
+                                <form th:action="@{/locations/delete/{id}(id=${room.id})}" method="post">
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        Excluir
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
