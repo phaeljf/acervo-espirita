@@ -24,7 +24,6 @@ public class ShelfPosition implements Serializable {
     private Shelf shelf;
 
     public ShelfPosition(String positionName) {
-
         if (positionName == null || positionName.isBlank()) {
             throw new IllegalArgumentException("Insira um nome para a prateleira");
         }
@@ -37,14 +36,21 @@ public class ShelfPosition implements Serializable {
         if (shelf == null) {
             return name;
         }
-        return shelf.getName() + name;
+        return shelf.getRoom().getName()
+                + " → "
+                + shelf.getName()
+                + " → "
+                + name;
     }
 
     // Equals and HashCode
     @Override
     public boolean equals(Object o) {
+
         if (o == null || getClass() != o.getClass()) return false;
+
         ShelfPosition that = (ShelfPosition) o;
+
         return Objects.equals(id, that.id);
     }
 

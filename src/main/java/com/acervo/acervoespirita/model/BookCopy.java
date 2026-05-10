@@ -11,7 +11,7 @@ import java.util.Objects;
 @Table(name = "book_copies")
 @Getter
 @NoArgsConstructor
-@ToString(exclude = {"book", "location"})
+@ToString(exclude = {"book", "shelfPosition"})
 public class BookCopy implements Serializable {
 
     @Id
@@ -24,8 +24,8 @@ public class BookCopy implements Serializable {
     private Book book;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id")
-    private Location location;
+    @JoinColumn(name = "shelf_position_id")
+    private ShelfPosition shelfPosition;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -35,52 +35,60 @@ public class BookCopy implements Serializable {
     private String code;
 
     @Builder
-    public BookCopy(Book book, Location location, String code) {
+    public BookCopy(Book book, ShelfPosition shelfPosition, String code) {
+
         if (book == null) {
             throw new IllegalArgumentException("Livro é obrigatório");
         }
+
         if (code == null || code.isBlank()) {
             throw new IllegalArgumentException("Código da cópia é obrigatório");
         }
 
         this.book = book;
-        this.location = location;
+        this.shelfPosition = shelfPosition;
         this.code = code.trim().toUpperCase();
         this.status = BookStatus.AVAILABLE;
     }
 
-    // Metodo de verificação
+    // Métodos
 
     public boolean isAvailable() {
         return status == BookStatus.AVAILABLE;
     }
 
     public void markAsLoaned() {
+
         if (!isAvailable()) {
             throw new IllegalStateException("Cópia não está disponível");
         }
+
         this.status = BookStatus.LOANED;
-        this.location = null;
+        this.shelfPosition = null;
     }
 
-    public void markAsReturned(Location location) {
-        if (location == null) {
+    public void markAsReturned(ShelfPosition shelfPosition) {
+
+        if (shelfPosition == null) {
             throw new IllegalArgumentException("Localização obrigatória");
         }
 
         this.status = BookStatus.AVAILABLE;
-        this.location = location;
+        this.shelfPosition = shelfPosition;
     }
 
-    public void updateLocation(Location location) {
-        this.location = location;
+    public void updateShelfPosition(ShelfPosition shelfPosition) {
+        this.shelfPosition = shelfPosition;
     }
 
-    // Equals hashcode
+    // Equals and HashCode
     @Override
     public boolean equals(Object o) {
+
         if (o == null || getClass() != o.getClass()) return false;
+
         BookCopy bookCopy = (BookCopy) o;
+
         return Objects.equals(id, bookCopy.id);
     }
 

@@ -2,6 +2,8 @@ package com.acervo.acervoespirita.config;
 
 import com.acervo.acervoespirita.model.*;
 import com.acervo.acervoespirita.model.enums.UserRole;
+import com.acervo.acervoespirita.repository.RoomRepository;
+import com.acervo.acervoespirita.repository.ShelfRepository;
 import com.acervo.acervoespirita.repository.UserRepository;
 import com.acervo.acervoespirita.service.*;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +18,9 @@ public class TestDataRunner implements CommandLineRunner {
 
     private final ConfigurationService configurationService;
     private final UserRepository userRepository;
+    private final RoomRepository roomRepository;
+    private final ShelfRepository shelfRepository;
     private final UserService userService;
-    private final LocationService locationService;
     private final BookService bookService;
     private final BookCopyService bookCopyService;
     private final LoanService loanService;
@@ -64,12 +67,28 @@ public class TestDataRunner implements CommandLineRunner {
         );
 
         // =========================
+        // Salas
+        // =========================
+
+        Room mainRoom = new Room("SALÃO");
+        Room officeRoom = new Room("SECRETARIA");
+
+        // =========================
         // Estantes
         // =========================
 
         Shelf shelf1 = new Shelf("E1");
         Shelf shelf2 = new Shelf("E2");
-        Shelf shelf3 = new Shelf("E3");
+        Shelf shelf3 = new Shelf("E1");
+
+        mainRoom.addShelf(shelf1);
+        mainRoom.addShelf(shelf2);
+
+        officeRoom.addShelf(shelf3);
+
+        // =========================
+        // Prateleiras
+        // =========================
 
         ShelfPosition p1Shelf1 = new ShelfPosition("P1");
         ShelfPosition p2Shelf1 = new ShelfPosition("P2");
@@ -87,24 +106,8 @@ public class TestDataRunner implements CommandLineRunner {
 
         shelf3.addPosition(p1Shelf3);
 
-        // =========================
-        // Localizações
-        // =========================
-
-        Location location1 = locationService.createLocation(
-                new Location(shelf1, p1Shelf1),
-                admin
-        );
-
-        Location location2 = locationService.createLocation(
-                new Location(shelf2, p2Shelf2),
-                admin
-        );
-
-        Location location3 = locationService.createLocation(
-                new Location(shelf3, p1Shelf3),
-                admin
-        );
+        roomRepository.save(mainRoom);
+        roomRepository.save(officeRoom);
 
         // =========================
         // Livros
@@ -129,31 +132,25 @@ public class TestDataRunner implements CommandLineRunner {
         // Cópias Livro 1
         // =========================
 
-        bookCopyService.createBookCopy(savedBook1.getId(), location1.getId(), "OLE-001", admin);
+        bookCopyService.createBookCopy(savedBook1.getId(), p1Shelf1.getId(), "OLE-001", admin);
 
         // =========================
         // Cópias Livro 2
         // =========================
 
-        bookCopyService.createBookCopy(savedBook2.getId(), location1.getId(), "OLM-001", admin);
-
-        bookCopyService.createBookCopy(savedBook2.getId(), location2.getId(), "OLM-002", admin);
-
-        bookCopyService.createBookCopy(savedBook2.getId(), location3.getId(), "OLM-003", admin);
+        bookCopyService.createBookCopy(savedBook2.getId(), p1Shelf1.getId(), "OLM-001", admin);
+        bookCopyService.createBookCopy(savedBook2.getId(), p2Shelf2.getId(), "OLM-002", admin);
+        bookCopyService.createBookCopy(savedBook2.getId(), p1Shelf3.getId(), "OLM-003", admin);
 
         // =========================
         // Cópias Livro 3
         // =========================
 
-        bookCopyService.createBookCopy(savedBook3.getId(), location1.getId(), "ESE-001", admin);
-
-        bookCopyService.createBookCopy(savedBook3.getId(), location1.getId(), "ESE-002", admin);
-
-        bookCopyService.createBookCopy(savedBook3.getId(), location2.getId(), "ESE-003", admin);
-
-        bookCopyService.createBookCopy(savedBook3.getId(), location2.getId(), "ESE-004", admin);
-
-        bookCopyService.createBookCopy(savedBook3.getId(), location3.getId(), "ESE-005", admin);
+        bookCopyService.createBookCopy(savedBook3.getId(), p1Shelf1.getId(), "ESE-001", admin);
+        bookCopyService.createBookCopy(savedBook3.getId(), p1Shelf1.getId(), "ESE-002", admin);
+        bookCopyService.createBookCopy(savedBook3.getId(), p2Shelf2.getId(), "ESE-003", admin);
+        bookCopyService.createBookCopy(savedBook3.getId(), p2Shelf2.getId(), "ESE-004", admin);
+        bookCopyService.createBookCopy(savedBook3.getId(), p1Shelf3.getId(), "ESE-005", admin);
 
         System.out.println("Dados de teste criados com sucesso.");
 

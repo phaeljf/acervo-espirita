@@ -3,13 +3,10 @@ package com.acervo.acervoespirita.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -47,24 +44,22 @@ public class LoanItem implements Serializable {
         bookCopy.markAsLoaned();
     }
 
-    //Comportamento
-
+    // Métodos
 
     public boolean isReturned() {
         return returnDate != null;
     }
 
-    public void markAsReturned(Location location) {
+    public void markAsReturned(ShelfPosition shelfPosition) {
+
         if (isReturned()) {
             throw new IllegalStateException("Livro já devolvido");
         }
         this.returnDate = LocalDate.now();
-        this.bookCopy.markAsReturned(location);
+        this.bookCopy.markAsReturned(shelfPosition);
     }
 
-
-
-    // Equals Hashcode
+    // Equals and HashCode
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

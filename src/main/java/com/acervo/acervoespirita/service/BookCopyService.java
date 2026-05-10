@@ -2,13 +2,13 @@ package com.acervo.acervoespirita.service;
 
 import com.acervo.acervoespirita.model.Book;
 import com.acervo.acervoespirita.model.BookCopy;
-import com.acervo.acervoespirita.model.Location;
+import com.acervo.acervoespirita.model.ShelfPosition;
 import com.acervo.acervoespirita.model.User;
 import com.acervo.acervoespirita.model.enums.BookStatus;
 import com.acervo.acervoespirita.model.enums.LogType;
 import com.acervo.acervoespirita.repository.BookCopyRepository;
 import com.acervo.acervoespirita.repository.BookRepository;
-import com.acervo.acervoespirita.repository.LocationRepository;
+import com.acervo.acervoespirita.repository.ShelfPositionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,36 +21,37 @@ public class BookCopyService {
 
     private final BookCopyRepository bookCopyRepository;
     private final BookRepository bookRepository;
-    private final LocationRepository locationRepository;
+    private final ShelfPositionRepository shelfPositionRepository;
     private final LogService logService;
 
     // Cria um novo exemplar
     @Transactional
-    public BookCopy createBookCopy(Long bookId, Long locationId, String code, User createdBy) {
+    public BookCopy createBookCopy(Long bookId, Long shelfPositionId, String code, User createdBy) {
 
         if (bookCopyRepository.existsByCode(code.trim().toUpperCase())) {
             throw new IllegalArgumentException("Já existe um exemplar com esse código.");
         }
 
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("Livro não encontrado."));
-        Location location = locationRepository.findById(locationId).orElseThrow(() -> new IllegalArgumentException("Localização não encontrada."));
+
+        ShelfPosition shelfPosition = shelfPositionRepository.findById(shelfPositionId)
+                .orElseThrow(() -> new IllegalArgumentException("Prateleira não encontrada."));
 
         BookCopy bookCopy = BookCopy.builder()
                 .book(book)
-                .location(location)
+                .shelfPosition(shelfPosition)
                 .code(code)
                 .build();
 
         BookCopy savedBookCopy = bookCopyRepository.save(bookCopy);
 
         logService.register(LogType.BOOK_COPY_CREATED, createdBy, "Exemplar " + savedBookCopy.getCode() + " do livro " + book.getTitle() + " foi criado.");
-
         return savedBookCopy;
     }
 
     // Atualiza localização do exemplar
     @Transactional
-    public BookCopy updateLocation(Long id, Long locationId, User updatedBy) {
+    public BookCopy updateShelfPosition(Long id, Long shelfPositionId, User updatedBy) {
 
         BookCopy bookCopy = findById(id);
 
@@ -58,12 +59,11 @@ public class BookCopyService {
             throw new IllegalStateException("Não é possível alterar localização de exemplar emprestado.");
         }
 
-        Location location = locationRepository.findById(locationId).orElseThrow(() -> new IllegalArgumentException("Localização não encontrada."));
+        ShelfPosition shelfPosition = shelfPositionRepository.findById(shelfPositionId)
+                .orElseThrow(() -> new IllegalArgumentException("Prateleira não encontrada."));
 
-        bookCopy.updateLocation(location);
-
+        bookCopy.updateShelfPosition(shelfPosition);
         BookCopy updatedBookCopy = bookCopyRepository.save(bookCopy);
-
         logService.register(LogType.BOOK_COPY_UPDATED, updatedBy, "Localização do exemplar " + updatedBookCopy.getCode() + " foi atualizada.");
 
         return updatedBookCopy;
@@ -80,7 +80,6 @@ public class BookCopyService {
         }
 
         bookCopyRepository.delete(bookCopy);
-
         logService.register(LogType.BOOK_COPY_DELETED, deletedBy, "Exemplar " + bookCopy.getCode() + " foi removido.");
     }
 
@@ -102,10 +101,10 @@ public class BookCopyService {
         return bookCopyRepository.findByBook(book);
     }
 
-    // Lista exemplares por localização
+    // Lista exemplares por prateleira
     @Transactional(readOnly = true)
-    public List<BookCopy> findByLocation(Location location) {
-        return bookCopyRepository.findByLocation(location);
+    public List<BookCopy> findByShelfPosition(ShelfPosition shelfPosition) {
+        return bookCopyRepository.findByShelfPosition(shelfPosition);
     }
 
     // Lista exemplares disponíveis

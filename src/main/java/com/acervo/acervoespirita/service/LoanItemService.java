@@ -2,13 +2,12 @@ package com.acervo.acervoespirita.service;
 
 import com.acervo.acervoespirita.model.Loan;
 import com.acervo.acervoespirita.model.LoanItem;
-import com.acervo.acervoespirita.model.Location;
+import com.acervo.acervoespirita.model.ShelfPosition;
 import com.acervo.acervoespirita.model.User;
 import com.acervo.acervoespirita.model.enums.LogType;
-import com.acervo.acervoespirita.model.enums.LoanStatus;
 import com.acervo.acervoespirita.repository.LoanItemRepository;
 import com.acervo.acervoespirita.repository.LoanRepository;
-import com.acervo.acervoespirita.repository.LocationRepository;
+import com.acervo.acervoespirita.repository.ShelfPositionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,12 +20,12 @@ public class LoanItemService {
 
     private final LoanItemRepository loanItemRepository;
     private final LoanRepository loanRepository;
-    private final LocationRepository locationRepository;
+    private final ShelfPositionRepository shelfPositionRepository;
     private final LogService logService;
 
     // Realiza devolução de um exemplar
     @Transactional
-    public LoanItem returnBook(Long loanItemId, Long locationId, String observation, User handledBy) {
+    public LoanItem returnBook(Long loanItemId, Long shelfPositionId, String observation, User handledBy) {
 
         LoanItem loanItem = findById(loanItemId);
 
@@ -34,9 +33,10 @@ public class LoanItemService {
             throw new IllegalStateException("Exemplar já foi devolvido.");
         }
 
-        Location location = locationRepository.findById(locationId).orElseThrow(() -> new IllegalArgumentException("Localização não encontrada."));
+        ShelfPosition shelfPosition = shelfPositionRepository.findById(shelfPositionId)
+                .orElseThrow(() -> new IllegalArgumentException("Prateleira não encontrada."));
 
-        loanItem.markAsReturned(location);
+        loanItem.markAsReturned(shelfPosition);
 
         LoanItem updatedLoanItem = loanItemRepository.save(loanItem);
 
