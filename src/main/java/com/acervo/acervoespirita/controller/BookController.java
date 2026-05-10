@@ -21,9 +21,7 @@ public class BookController {
     }
 
     @GetMapping("/books")
-    public String books(@RequestParam(required = false) String bookName,
-                        HttpSession session,
-                        Model model) {
+    public String books(@RequestParam(required = false) String bookName, HttpSession session, Model model) {
         if (!sessionService.isLogged(session)) {
             return "redirect:/";
         }
@@ -43,7 +41,7 @@ public class BookController {
     }
 
     @GetMapping("/books/new")
-    public String newBook(HttpSession session,Model model) {
+    public String newBook(HttpSession session, Model model) {
         if (!sessionService.isLogged(session)) {
             return "redirect:/";
         }
@@ -55,7 +53,7 @@ public class BookController {
     }
 
     @GetMapping("/books/{id}/edit")
-    public String editBook(@PathVariable Long id,HttpSession session,Model model) {
+    public String editBook(@PathVariable Long id, HttpSession session, Model model) {
         if (!sessionService.isLogged(session)) {
             return "redirect:/";
         }
@@ -72,6 +70,7 @@ public class BookController {
     public String saveBook(@RequestParam(required = false) Long id,
                            @RequestParam String title,
                            @RequestParam String author,
+                           @RequestParam(required = false) String psychographedBy,
                            @RequestParam(required = false) String category,
                            HttpSession session,
                            Model model) {
@@ -84,11 +83,11 @@ public class BookController {
 
         try {
             if (id == null) {
-                Book book = new Book(title, author);
+                Book book = new Book(title, author, psychographedBy);
                 book.setCategory(category);
                 bookService.createBook(book, loggedUser);
             } else {
-               bookService.updateBook(id, title, author, category, loggedUser);
+                bookService.updateBook(id, title, author, psychographedBy, category, loggedUser);
             }
             return "redirect:/books";
 
@@ -98,6 +97,7 @@ public class BookController {
             book.setId(id);
             book.setTitle(title);
             book.setAuthor(author);
+            book.setPsychographedBy(psychographedBy);
             book.setCategory(category);
 
             model.addAttribute("book", book);
@@ -110,15 +110,12 @@ public class BookController {
 
     @PostMapping("/books/{id}/delete")
     public String deleteBook(@PathVariable Long id, HttpSession session) {
-
         if (!sessionService.isLogged(session)) {
             return "redirect:/";
         }
-
         User loggedUser = sessionService.getLoggedUser(session);
         bookService.deleteBook(id, loggedUser);
 
         return "redirect:/books";
     }
-
 }

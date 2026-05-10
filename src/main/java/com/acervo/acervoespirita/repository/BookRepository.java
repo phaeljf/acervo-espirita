@@ -13,19 +13,20 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     // busca parcial por autor
     List<Book> findByAuthorContainingIgnoreCase(String author);
 
+    // busca parcial por psicografado
+    List<Book> findByPsychographedByContainingIgnoreCase(String psychographedBy);
+
     // busca por categoria
     List<Book> findByCategoryContainingIgnoreCase(String category);
 
-    // busca por título e autor
-    List<Book> findByTitleContainingIgnoreCaseAndAuthorContainingIgnoreCase(
+    // busca geral
+    List<Book> findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCaseOrPsychographedByContainingIgnoreCase(
             String title,
-            String author
+            String author,
+            String psychographedBy
     );
-
 
     List<Book> findByActiveTrue();
 
     List<Book> findByActiveFalse();
-
-
 }

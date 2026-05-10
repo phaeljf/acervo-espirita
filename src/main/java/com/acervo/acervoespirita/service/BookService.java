@@ -35,12 +35,13 @@ public class BookService {
 
     // Atualiza dados da obra
     @Transactional
-    public Book updateBook(Long id, String title, String author, String category, User updatedBy) {
+    public Book updateBook(Long id, String title, String author, String psychographedBy, String category, User updatedBy) {
 
         Book book = findById(id);
 
         book.setTitle(title);
         book.setAuthor(author);
+        book.setPsychographedBy(psychographedBy);
         book.setCategory(category);
 
         Book updatedBook = bookRepository.save(book);
@@ -153,13 +154,12 @@ public class BookService {
     }
 
     public List<Book> findByTitleNormalize(String bookName) {
-
         String normalizedBookName = normalize(bookName);
-
         return findAll().stream()
                 .filter(book ->
                         normalize(book.getTitle()).contains(normalizedBookName)
                                 || normalize(book.getAuthor()).contains(normalizedBookName)
+                                || normalize(book.getPsychographedBy()).contains(normalizedBookName)
                 )
                 .toList();
     }

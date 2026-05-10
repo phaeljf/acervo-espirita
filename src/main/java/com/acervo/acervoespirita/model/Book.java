@@ -28,6 +28,9 @@ public class Book implements Serializable {
     private String author;
 
     @Column
+    private String psychographedBy;
+
+    @Column
     private String category;
 
     @Column(nullable = false)
@@ -37,7 +40,8 @@ public class Book implements Serializable {
     @Setter(AccessLevel.NONE)
     private List<BookCopy> copies = new ArrayList<>();
 
-    public Book(String title, String author) {
+    public Book(String title, String author, String psychographedBy) {
+
         if (title == null || title.isBlank()) {
             throw new IllegalArgumentException("Título da obra não pode ser em branco");
         }
@@ -45,12 +49,13 @@ public class Book implements Serializable {
             throw new IllegalArgumentException("Nome do Autor não pode ser em branco");
         }
 
-        this.title = title;
-        this.author = author;
+        this.title = title.trim();
+        this.author = author.trim();
+        this.psychographedBy = psychographedBy != null ? psychographedBy.trim() : null;
         this.active = true;
     }
 
-    // Controle da relacionamento
+    // Controle do relacionamento
     public void addCopy(BookCopy copy) {
         copies.add(copy);
         copy.setBook(this);
@@ -66,11 +71,6 @@ public class Book implements Serializable {
     }
 
     // Controle do Livro
-
-    public boolean isActive() {
-        return active;
-    }
-
     public void deactivate() {
         this.active = false;
     }
@@ -98,7 +98,8 @@ public class Book implements Serializable {
         return getAvailableCopies() > 0;
     }
 
-    // equals e hashCode por ID (boa prática JPA)
+    // Equals e HashCode
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

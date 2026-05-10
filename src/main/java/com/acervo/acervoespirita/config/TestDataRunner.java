@@ -113,17 +113,17 @@ public class TestDataRunner implements CommandLineRunner {
         // Livros
         // =========================
 
-        Book book1 = new Book("O Livro dos Espíritos", "Allan Kardec");
+        Book book1 = new Book("O Livro dos Espíritos", "Allan Kardec", "");
         book1.setCategory("Base Espírita");
 
         Book savedBook1 = bookService.createBook(book1, admin);
 
-        Book book2 = new Book("O Livro dos Médiuns", "Allan Kardec");
+        Book book2 = new Book("O Livro dos Médiuns", "Allan Kardec", "");
         book2.setCategory("Base Espírita");
 
         Book savedBook2 = bookService.createBook(book2, admin);
 
-        Book book3 = new Book("O Evangelho Segundo o Espiritismo", "Allan Kardec");
+        Book book3 = new Book("O Evangelho Segundo o Espiritismo", "Allan Kardec", "");
         book3.setCategory("Base Espírita");
 
         Book savedBook3 = bookService.createBook(book3, admin);
