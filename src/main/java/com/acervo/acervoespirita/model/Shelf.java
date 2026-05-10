@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Table(name = "shelves", uniqueConstraints = {@UniqueConstraint(columnNames = {"room_id", "name"})})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,8 +22,12 @@ public class Shelf implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
+    private Room room;
 
     @OneToMany(mappedBy = "shelf", cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter(AccessLevel.NONE)
@@ -36,7 +41,6 @@ public class Shelf implements Serializable {
     }
 
     // Métodos
-
     public void addPosition(ShelfPosition position) {
         if (position == null) {
             throw new IllegalArgumentException("Prateleira inválida");
