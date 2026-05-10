@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Exemplares')}"></head>
+
+<body class="bg-light">
+
+<div class="d-flex">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- CONTEÚDO -->
+    <div class="flex-grow-1 p-4">
+
+        <div th:replace="~{fragments/topbar :: topbar('Exemplares')}"></div>
+
+        <!-- TOPO -->
+        <div class="mb-4">
+            <div class="d-flex gap-2 mb-3">
+                <a href="/copies/new" class="btn btn-primary">Adicionar Exemplar</a>
+            </div>
+        </div>
+
+        <!-- LISTA -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Livro</th>
+                        <th>Localização</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="copy : ${copies}">
+                        <td th:text="${copy.code}"></td>
+                        <td th:text="${copy.book.title}"></td>
+                        <td th:text="${copy.shelfPosition.fullPosition}"></td>
+                        <td th:text="${copy.status}"></td>
+                        <td>
+                            <form th:action="@{/copies/{id}/delete(id=${copy.id})}" method="post">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    Excluir
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -28,8 +28,10 @@ public class BookCopyService {
     @Transactional
     public BookCopy createBookCopy(Long bookId, Long shelfPositionId, String code, User createdBy) {
 
-        if (bookCopyRepository.existsByCode(code.trim().toUpperCase())) {
-            throw new IllegalArgumentException("Já existe um exemplar com esse código.");
+        if (code != null && !code.isBlank()) {
+            if (bookCopyRepository.existsByCode(code.trim().toUpperCase())) {
+                throw new IllegalArgumentException("Já existe um exemplar com esse código.");
+            }
         }
 
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new IllegalArgumentException("Livro não encontrado."));

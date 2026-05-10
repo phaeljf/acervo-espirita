@@ -31,7 +31,7 @@ public class BookCopy implements Serializable {
     @Column(nullable = false)
     private BookStatus status;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String code;
 
     @Builder
@@ -40,14 +40,9 @@ public class BookCopy implements Serializable {
         if (book == null) {
             throw new IllegalArgumentException("Livro é obrigatório");
         }
-
-        if (code == null || code.isBlank()) {
-            throw new IllegalArgumentException("Código da cópia é obrigatório");
-        }
-
         this.book = book;
         this.shelfPosition = shelfPosition;
-        this.code = code.trim().toUpperCase();
+        this.code = (code == null || code.isBlank()) ? null : code.trim().toUpperCase();
         this.status = BookStatus.AVAILABLE;
     }
 
