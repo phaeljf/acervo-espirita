@@ -3,7 +3,6 @@ package com.acervo.acervoespirita.config;
 import com.acervo.acervoespirita.model.*;
 import com.acervo.acervoespirita.model.enums.UserRole;
 import com.acervo.acervoespirita.repository.RoomRepository;
-import com.acervo.acervoespirita.repository.ShelfRepository;
 import com.acervo.acervoespirita.repository.UserRepository;
 import com.acervo.acervoespirita.service.*;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ public class TestDataRunner implements CommandLineRunner {
     private final ConfigurationService configurationService;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
-    private final ShelfRepository shelfRepository;
     private final UserService userService;
     private final BookService bookService;
     private final BookCopyService bookCopyService;
@@ -106,26 +104,36 @@ public class TestDataRunner implements CommandLineRunner {
 
         shelf3.addPosition(p1Shelf3);
 
-        roomRepository.save(mainRoom);
-        roomRepository.save(officeRoom);
+        // =========================
+        // Salva salas e recarrega IDs
+        // =========================
+
+        mainRoom = roomRepository.save(mainRoom);
+        officeRoom = roomRepository.save(officeRoom);
+
+        // =========================
+        // Recupera posições salvas
+        // =========================
+
+        p1Shelf1 = mainRoom.getShelves().get(0).getPositions().get(0);
+        p2Shelf1 = mainRoom.getShelves().get(0).getPositions().get(1);
+
+        p1Shelf2 = mainRoom.getShelves().get(1).getPositions().get(0);
+        p2Shelf2 = mainRoom.getShelves().get(1).getPositions().get(1);
+
+        p1Shelf3 = officeRoom.getShelves().get(0).getPositions().get(0);
 
         // =========================
         // Livros
         // =========================
 
         Book book1 = new Book("O Livro dos Espíritos", "Allan Kardec", "");
-        book1.setCategory("Base Espírita");
-
         Book savedBook1 = bookService.createBook(book1, admin);
 
         Book book2 = new Book("O Livro dos Médiuns", "Allan Kardec", "");
-        book2.setCategory("Base Espírita");
-
         Book savedBook2 = bookService.createBook(book2, admin);
 
         Book book3 = new Book("O Evangelho Segundo o Espiritismo", "Allan Kardec", "");
-        book3.setCategory("Base Espírita");
-
         Book savedBook3 = bookService.createBook(book3, admin);
 
         // =========================

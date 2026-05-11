@@ -1,5 +1,6 @@
 package com.acervo.acervoespirita.model;
 
+import com.acervo.acervoespirita.model.enums.BookStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -33,8 +34,9 @@ public class Book implements Serializable {
     @Column
     private String category;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private boolean active;
+    private BookStatus status;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter(AccessLevel.NONE)
@@ -52,7 +54,7 @@ public class Book implements Serializable {
         this.title = title.trim();
         this.author = author.trim();
         this.psychographedBy = psychographedBy != null ? psychographedBy.trim() : null;
-        this.active = true;
+        this.status = BookStatus.ACTIVE;
     }
 
     // Controle do relacionamento
@@ -71,12 +73,8 @@ public class Book implements Serializable {
     }
 
     // Controle do Livro
-    public void deactivate() {
-        this.active = false;
-    }
-
-    public void activate() {
-        this.active = true;
+    public boolean isActive() {
+        return status == BookStatus.ACTIVE;
     }
 
     // Controle de cópias

@@ -2,6 +2,7 @@ package com.acervo.acervoespirita.service;
 
 import com.acervo.acervoespirita.model.Book;
 import com.acervo.acervoespirita.model.User;
+import com.acervo.acervoespirita.model.enums.BookStatus;
 import com.acervo.acervoespirita.model.enums.LogType;
 import com.acervo.acervoespirita.repository.BookCopyRepository;
 import com.acervo.acervoespirita.repository.BookRepository;
@@ -25,9 +26,7 @@ public class BookService {
     // Cria uma nova obra
     @Transactional
     public Book createBook(Book book, User createdBy) {
-
         Book savedBook = bookRepository.save(book);
-
         logService.register(LogType.BOOK_CREATED, createdBy, "Livro " + savedBook.getTitle() + " foi criado.");
 
         return savedBook;
@@ -35,59 +34,67 @@ public class BookService {
 
     // Atualiza dados da obra
     @Transactional
-    public Book updateBook(Long id, String title, String author, String psychographedBy, String category, User updatedBy) {
+    public Book updateBook(Long id, String title, String author, String psychographedBy, User updatedBy) {
 
         Book book = findById(id);
 
         book.setTitle(title);
         book.setAuthor(author);
         book.setPsychographedBy(psychographedBy);
-        book.setCategory(category);
-
         Book updatedBook = bookRepository.save(book);
-
         logService.register(LogType.BOOK_UPDATED, updatedBy, "Livro " + updatedBook.getTitle() + " foi atualizado.");
 
         return updatedBook;
     }
 
-    // Inativa obra
+    // Arquiva obra
     @Transactional
-    public Book deactivateBook(Long id, User deactivatedBy) {
+    public Book archiveBook(Long id, User archivedBy) {
 
         Book book = findById(id);
-
         boolean hasLoanedCopies = book.getCopies().stream().anyMatch(copy -> !copy.isAvailable());
 
         if (hasLoanedCopies) {
-            throw new IllegalStateException("Não é possível inativar livro com exemplares emprestados.");
+            throw new IllegalStateException("Não é possível arquivar livro com exemplares emprestados.");
         }
 
-        book.deactivate();
-
+        book.setStatus(BookStatus.ARCHIVED);
         Book updatedBook = bookRepository.save(book);
-
-        logService.register(LogType.BOOK_DEACTIVATED, deactivatedBy, "Livro " + updatedBook.getTitle() + " foi inativado.");
+        logService.register(LogType.BOOK_DEACTIVATED, archivedBy, "Livro " + updatedBook.getTitle() + " foi arquivado.");
 
         return updatedBook;
     }
 
-    // Reativa obra
+    // Ativa obra
     @Transactional
     public Book activateBook(Long id, User activatedBy) {
 
         Book book = findById(id);
-
-        book.activate();
-
+        book.setStatus(BookStatus.ACTIVE);
         Book updatedBook = bookRepository.save(book);
-
-        logService.register(LogType.BOOK_REACTIVATED, activatedBy, "Livro " + updatedBook.getTitle() + " foi reativado.");
+        logService.register(LogType.BOOK_REACTIVATED, activatedBy, "Livro " + updatedBook.getTitle() + " foi ativado.");
 
         return updatedBook;
     }
 
-    //Deletar um livro
+    // Marca como doado
+    @Transactional
+    public Book donateBook(Long id, User donatedBy) {
+
+        Book book = findById(id);
+        boolean hasLoanedCopies = book.getCopies().stream().anyMatch(copy -> !copy.isAvailable());
+        if (hasLoanedCopies) {
+            throw new IllegalStateException("Não é possível doar livro com exemplares emprestados.");
+        }
+
+        book.setStatus(BookStatus.DONATED);
+        Book updatedBook = bookRepository.save(book);
+        logService.register(LogType.BOOK_UPDATED, donatedBy, "Livro " + updatedBook.getTitle() + " foi marcado como doado.");
+
+        return updatedBook;
+    }
+
+    // Deletar um livro
     @Transactional
     public void deleteBook(Long id, User deletedBy) {
 
@@ -129,13 +136,19 @@ public class BookService {
     // Lista livros ativos
     @Transactional(readOnly = true)
     public List<Book> findActiveBooks() {
-        return bookRepository.findByActiveTrue();
+        return bookRepository.findByStatus(BookStatus.ACTIVE);
     }
 
-    // Lista livros inativos
+    // Lista livros arquivados
     @Transactional(readOnly = true)
-    public List<Book> findInactiveBooks() {
-        return bookRepository.findByActiveFalse();
+    public List<Book> findArchivedBooks() {
+        return bookRepository.findByStatus(BookStatus.ARCHIVED);
+    }
+
+    // Lista livros doados
+    @Transactional(readOnly = true)
+    public List<Book> findDonatedBooks() {
+        return bookRepository.findByStatus(BookStatus.DONATED);
     }
 
     // Lista todos os livros
@@ -159,7 +172,7 @@ public class BookService {
                 .filter(book ->
                         normalize(book.getTitle()).contains(normalizedBookName)
                                 || normalize(book.getAuthor()).contains(normalizedBookName)
-                                || normalize(book.getPsychographedBy()).contains(normalizedBookName)
+                                || normalize(book.getPsychographedBy() == null ? "" : book.getPsychographedBy()).contains(normalizedBookName)
                 )
                 .toList();
     }

@@ -1,70 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-
-<head th:replace="~{fragments/head :: head('Novo Exemplar')}"></head>
-
+<head th:replace="~{fragments/head :: head('Exemplares')}"></head>
 <body class="bg-light">
-
 <div class="d-flex">
-
-    <!-- SIDEBAR -->
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-
-    <!-- CONTEÚDO -->
     <div class="flex-grow-1 p-4">
-
-        <div th:replace="~{fragments/topbar :: topbar('Novo Exemplar')}"></div>
-
-        <!-- ERRO -->
-        <div th:if="${error}" class="alert alert-danger">
-            <span th:text="${error}"></span>
-        </div>
-
-        <!-- FORM -->
+        <div th:replace="~{fragments/topbar :: topbar('Exemplares')}"></div>
         <div class="card shadow-sm">
             <div class="card-body">
-                <form th:action="@{/copies}" method="post">
-                    <!-- LIVRO -->
-                    <div class="mb-3">
-                        <label class="form-label">Livro</label>
-                        <select name="bookId" class="form-select">
-                            <option value="">Selecione um livro</option>
-                            <option th:each="book : ${books}"
-                                    th:value="${book.id}"
-                                    th:text="${book.title}">
-                            </option>
-                        </select>
-                    </div>
-                    <!-- PRATELEIRA -->
-                    <div class="mb-3">
-                        <label class="form-label">Prateleira</label>
-                        <select name="shelfPositionId" class="form-select">
-                            <option value="">Selecione uma prateleira</option>
-                            <option th:each="position : ${positions}"
-                                    th:value="${position.id}"
-                                    th:text="${position.fullPosition}">
-                            </option>
-                        </select>
-                    </div>
-
-                    <!-- CÓDIGO -->
-                    <div class="mb-3">
-                        <label class="form-label">Código do Exemplar</label>
-                        <input type="text"
-                               name="code"
-                               class="form-control"
-                               placeholder="Ex: OLE-001">
-                    </div>
-                    <!-- BOTÕES -->
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Salvar</button>
-                        <a href="/copies" class="btn btn-secondary">Cancelar</a>
-                    </div>
-                </form>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Livro</th>
+                        <th>Autor</th>
+                        <th>Exemplares</th>
+                        <th>Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="book : ${books}">
+                        <td th:text="${book.title}"></td>
+                        <td th:text="${book.author}"></td>
+                        <td th:text="${book.totalCopies}"></td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a th:href="@{/copies/book/{id}(id=${book.id})}" class="btn btn-sm btn-info">Gerenciar Exemplares</a>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
-
 </body>
 </html>

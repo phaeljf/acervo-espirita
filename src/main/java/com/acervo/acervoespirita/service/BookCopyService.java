@@ -4,7 +4,7 @@ import com.acervo.acervoespirita.model.Book;
 import com.acervo.acervoespirita.model.BookCopy;
 import com.acervo.acervoespirita.model.ShelfPosition;
 import com.acervo.acervoespirita.model.User;
-import com.acervo.acervoespirita.model.enums.BookStatus;
+import com.acervo.acervoespirita.model.enums.BookCopyStatus;
 import com.acervo.acervoespirita.model.enums.LogType;
 import com.acervo.acervoespirita.repository.BookCopyRepository;
 import com.acervo.acervoespirita.repository.BookRepository;
@@ -39,37 +39,35 @@ public class BookCopyService {
         ShelfPosition shelfPosition = shelfPositionRepository.findById(shelfPositionId)
                 .orElseThrow(() -> new IllegalArgumentException("Prateleira não encontrada."));
 
-        BookCopy bookCopy = BookCopy.builder()
-                .book(book)
-                .shelfPosition(shelfPosition)
-                .code(code)
-                .build();
+        BookCopy bookCopy = new BookCopy(
+                book,
+                shelfPosition,
+                code
+        );
 
         BookCopy savedBookCopy = bookCopyRepository.save(bookCopy);
 
         logService.register(LogType.BOOK_COPY_CREATED, createdBy, "Exemplar " + savedBookCopy.getCode() + " do livro " + book.getTitle() + " foi criado.");
         return savedBookCopy;
     }
-
-    // Atualiza localização do exemplar
+    // Atualiza exemplar
     @Transactional
-    public BookCopy updateShelfPosition(Long id, Long shelfPositionId, User updatedBy) {
+    public BookCopy updateCopy(Long id, Long shelfPositionId, String code, BookCopyStatus status, User updatedBy) {
 
-        BookCopy bookCopy = findById(id);
+        BookCopy copy = findById(id);
+        ShelfPosition shelfPosition = null;
 
-        if (!bookCopy.isAvailable()) {
-            throw new IllegalStateException("Não é possível alterar localização de exemplar emprestado.");
+        if (status != BookCopyStatus.LOANED) {
+            shelfPosition = shelfPositionRepository.findById(shelfPositionId).orElseThrow(() -> new IllegalArgumentException("Prateleira não encontrada."));
         }
 
-        ShelfPosition shelfPosition = shelfPositionRepository.findById(shelfPositionId)
-                .orElseThrow(() -> new IllegalArgumentException("Prateleira não encontrada."));
+        copy.updateData(shelfPosition, code, status);
+        BookCopy updatedCopy = bookCopyRepository.save(copy);
 
-        bookCopy.updateShelfPosition(shelfPosition);
-        BookCopy updatedBookCopy = bookCopyRepository.save(bookCopy);
-        logService.register(LogType.BOOK_COPY_UPDATED, updatedBy, "Localização do exemplar " + updatedBookCopy.getCode() + " foi atualizada.");
-
-        return updatedBookCopy;
+        logService.register(LogType.BOOK_COPY_UPDATED,updatedBy,"Exemplar " + updatedCopy.getId() + " foi atualizado.");
+        return updatedCopy;
     }
+
 
     // Remove exemplar
     @Transactional
@@ -91,12 +89,6 @@ public class BookCopyService {
         return bookCopyRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Exemplar não encontrado."));
     }
 
-    // Busca exemplar por código
-    @Transactional(readOnly = true)
-    public BookCopy findByCode(String code) {
-        return bookCopyRepository.findByCode(code.trim().toUpperCase()).orElseThrow(() -> new IllegalArgumentException("Exemplar não encontrado."));
-    }
-
     // Lista exemplares por livro
     @Transactional(readOnly = true)
     public List<BookCopy> findByBook(Book book) {
@@ -112,13 +104,13 @@ public class BookCopyService {
     // Lista exemplares disponíveis
     @Transactional(readOnly = true)
     public List<BookCopy> findAvailableCopies() {
-        return bookCopyRepository.findByStatus(BookStatus.AVAILABLE);
+        return bookCopyRepository.findByStatus(BookCopyStatus.AVAILABLE);
     }
 
     // Lista exemplares emprestados
     @Transactional(readOnly = true)
     public List<BookCopy> findLoanedCopies() {
-        return bookCopyRepository.findByStatus(BookStatus.LOANED);
+        return bookCopyRepository.findByStatus(BookCopyStatus.LOANED);
     }
 
     // Lista todos os exemplares

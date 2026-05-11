@@ -1,13 +1,16 @@
 package com.acervo.acervoespirita.model.enums;
 
-public enum LoanStatus {
+public enum BookCopyStatus {
 
-    OPEN("Aberto"),
-    CLOSED("Fechado");
+    AVAILABLE("Disponível"),
+    LOANED("Emprestado"),
+    LOST("Perdido"),
+    DAMAGED("Danificado"),
+    INACTIVE("Inativo");
 
     private final String description;
 
-    LoanStatus(String description) {
+    BookCopyStatus(String description) {
         this.description = description;
     }
 

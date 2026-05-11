@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Detalhes do Livro')}"></head>
+<body class="bg-light">
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="flex-grow-1 p-4">
+        <div th:replace="~{fragments/topbar :: topbar('Detalhes do Livro')}"></div>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 th:text="${book.title}"></h3>
+                <hr>
+                <p><strong>Autor:</strong> <span th:text="${book.author}"></span></p>
+                <p><strong>Psicografado por:</strong> <span th:text="${book.psychographedBy}"></span></p>
+                <p><strong>Total de Exemplares:</strong> <span th:text="${book.totalCopies}"></span></p>
+                <p><strong>Exemplares Disponíveis:</strong> <span th:text="${book.availableCopies}"></span></p>
+                <p><strong>Status:</strong> <span th:text="${book.status.description}"></span></p>
+                <div class="d-flex gap-2 mt-4">
+                    <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-warning">Editar</a>
+                    <a href="/books" class="btn btn-secondary">Voltar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 package com.acervo.acervoespirita.model;
 
-import com.acervo.acervoespirita.model.enums.BookStatus;
+import com.acervo.acervoespirita.model.enums.BookCopyStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,7 +29,7 @@ public class BookCopy implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BookStatus status;
+    private BookCopyStatus status;
 
     @Column(unique = true)
     private String code;
@@ -43,13 +43,13 @@ public class BookCopy implements Serializable {
         this.book = book;
         this.shelfPosition = shelfPosition;
         this.code = (code == null || code.isBlank()) ? null : code.trim().toUpperCase();
-        this.status = BookStatus.AVAILABLE;
+        this.status = BookCopyStatus.AVAILABLE;
     }
 
     // Métodos
 
     public boolean isAvailable() {
-        return status == BookStatus.AVAILABLE;
+        return status == BookCopyStatus.AVAILABLE;
     }
 
     public void markAsLoaned() {
@@ -58,7 +58,7 @@ public class BookCopy implements Serializable {
             throw new IllegalStateException("Cópia não está disponível");
         }
 
-        this.status = BookStatus.LOANED;
+        this.status = BookCopyStatus.LOANED;
         this.shelfPosition = null;
     }
 
@@ -68,12 +68,23 @@ public class BookCopy implements Serializable {
             throw new IllegalArgumentException("Localização obrigatória");
         }
 
-        this.status = BookStatus.AVAILABLE;
+        this.status = BookCopyStatus.AVAILABLE;
         this.shelfPosition = shelfPosition;
     }
 
-    public void updateShelfPosition(ShelfPosition shelfPosition) {
+    public void updateData(ShelfPosition shelfPosition, String code, BookCopyStatus status) {
+        if (shelfPosition == null && status == BookCopyStatus.AVAILABLE) {
+            throw new IllegalArgumentException("Exemplar disponível precisa possuir localização.");
+        }
+        if (status == BookCopyStatus.LOANED) {
+            throw new IllegalArgumentException("Para emprestar um exemplar utilize o sistema de empréstimos.");
+        }
+
         this.shelfPosition = shelfPosition;
+        this.code = (code == null || code.isBlank())
+                ? null
+                : code.trim().toUpperCase();
+        this.status = status;
     }
 
     // Equals and HashCode

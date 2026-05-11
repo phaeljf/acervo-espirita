@@ -1,6 +1,7 @@
 package com.acervo.acervoespirita.repository;
 
 import com.acervo.acervoespirita.model.Book;
+import com.acervo.acervoespirita.model.enums.BookStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -26,7 +27,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             String psychographedBy
     );
 
-    List<Book> findByActiveTrue();
-
-    List<Book> findByActiveFalse();
+    // busca por status
+    List<Book> findByStatus(BookStatus status);
 }

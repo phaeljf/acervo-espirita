@@ -1,34 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-
 <head th:replace="~{fragments/head :: head('Livros')}"></head>
-
 <body class="bg-light">
-
 <div class="d-flex">
-
-    <!-- SIDEBAR -->
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-
-    <!-- CONTEÚDO -->
     <div class="flex-grow-1 p-4">
-
         <div th:replace="~{fragments/topbar :: topbar('Livros')}"></div>
-
-        <!-- TOPO -->
         <div class="mb-4">
             <div class="d-flex gap-2 mb-3">
                 <a href="/books/new" class="btn btn-primary">Adicionar Livro</a>
-
-                <!-- BUSCA -->
                 <form action="/books" method="get" class="d-flex gap-2">
-                    <input type="text" name="bookName" class="form-control" placeholder="Pesquisar título, autor ou espírito..." style="max-width: 350px;" th:value="${search}">
+                    <input type="text" name="bookName" class="form-control" placeholder="Pesquisar livro..." style="max-width: 350px;" th:value="${search}">
                     <button type="submit" class="btn btn-secondary">Buscar</button>
                 </form>
             </div>
         </div>
-
-        <!-- TABELA -->
         <div class="card shadow-sm">
             <div class="card-body">
                 <table class="table table-hover">
@@ -36,8 +22,9 @@
                     <tr>
                         <th>Título</th>
                         <th>Autor</th>
-                        <th>Psicografado</th>
-                        <th>Categoria</th>
+                        <th>Psicografado Por</th>
+                        <th>Exemplares</th>
+                        <th>Status</th>
                         <th>Ações</th>
                     </tr>
                     </thead>
@@ -45,18 +32,15 @@
                     <tr th:each="book : ${books}">
                         <td th:text="${book.title}"></td>
                         <td th:text="${book.author}"></td>
-                        <td th:text="${book.psychographedBy != null ? book.psychographedBy : '-'}"></td>
-                        <td th:text="${book.category}"></td>
-                        <!-- AÇÕES -->
+                        <td th:text="${book.psychographedBy}"></td>
+                        <td th:text="${book.totalCopies}"></td>
+                        <td th:text="${book.status.description}"></td>
                         <td>
                             <div class="d-flex gap-2">
-                                <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-sm btn-warning">
-                                    Editar
-                                </a>
+                                <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-sm btn-info">Detalhes</a>
+                                <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-sm btn-warning">Editar</a>
                                 <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post">
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        Excluir
-                                    </button>
+                                    <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
                                 </form>
                             </div>
                         </td>

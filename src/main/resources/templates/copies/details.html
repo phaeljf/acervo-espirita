@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Exemplares do Livro')}"></head>
+<body class="bg-light">
+<div class="d-flex">
+
+    <!-- SIDEBAR -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- CONTEÚDO -->
+    <div class="flex-grow-1 p-4">
+
+        <!-- TOPBAR -->
+        <div th:replace="~{fragments/topbar :: topbar('Exemplares do Livro')}"></div>
+
+        <!-- ALERTA DE ERRO -->
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <!-- TÍTULO LIVRO -->
+        <div class="mb-4">
+            <h3 th:text="${book.title}"></h3>
+            <p class="text-muted mb-0" th:text="${book.author}"></p>
+        </div>
+
+        <!-- BOTÕES -->
+        <div class="mb-4">
+            <div class="d-flex gap-2">
+                <a th:href="@{/copies/new(bookId=${book.id})}" class="btn btn-primary">Adicionar Exemplar</a>
+                <a href="/copies" class="btn btn-secondary">Voltar</a>
+            </div>
+        </div>
+
+        <!-- LISTA EXEMPLARES -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-hover">
+
+                    <!-- CABEÇALHO -->
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Localização</th>
+                        <th>Status</th>
+                        <th>Código</th>
+                        <th>Ações</th>
+                    </tr>
+                    </thead>
+
+                    <!-- DADOS -->
+                    <tbody>
+                    <tr th:each="copy : ${copies}">
+                        <td th:text="${copy.id}"></td>
+                        <td th:text="${copy.shelfPosition != null ? copy.shelfPosition.fullPosition : 'Emprestado'}"></td>
+                        <td th:text="${copy.status.description}"></td>
+                        <td th:text="${copy.code != null ? copy.code : '-'}"></td>
+
+                        <!-- AÇÕES -->
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a th:href="@{/copies/{id}/edit(id=${copy.id})}" class="btn btn-sm btn-warning">Editar</a>
+                                <form th:action="@{/copies/{id}/delete(id=${copy.id})}" method="post">
+                                    <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                                </form>
+                            </div>
+                        </td>
+
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

@@ -515,7 +515,7 @@ public class Configuration implements Serializable {
 
 package com.acervo.acervoespirita.model;
 
-import com.acervo.acervoespirita.model.enums.BookStatus;
+import com.acervo.acervoespirita.model.enums.BookCopyStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

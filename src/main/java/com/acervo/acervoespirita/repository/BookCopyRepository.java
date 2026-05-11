@@ -3,7 +3,7 @@ package com.acervo.acervoespirita.repository;
 import com.acervo.acervoespirita.model.Book;
 import com.acervo.acervoespirita.model.BookCopy;
 import com.acervo.acervoespirita.model.ShelfPosition;
-import com.acervo.acervoespirita.model.enums.BookStatus;
+import com.acervo.acervoespirita.model.enums.BookCopyStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -18,13 +18,13 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
     boolean existsByCode(String code);
 
     // busca exemplares por status
-    List<BookCopy> findByStatus(BookStatus status);
+    List<BookCopy> findByStatus(BookCopyStatus status);
 
     // busca exemplares de um livro
     List<BookCopy> findByBook(Book book);
 
     // busca exemplares disponíveis de um livro
-    List<BookCopy> findByBookAndStatus(Book book, BookStatus status);
+    List<BookCopy> findByBookAndStatus(Book book, BookCopyStatus status);
 
     // busca exemplares por localização
     List<BookCopy> findByShelfPosition(ShelfPosition shelfPosition);

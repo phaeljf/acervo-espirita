@@ -1,70 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-
-<head th:replace="~{fragments/head :: head('Novo Livro')}"></head>
-
+<head th:replace="~{fragments/head :: head('Livro')}"></head>
 <body class="bg-light">
-
 <div class="d-flex">
-
-    <!-- SIDEBAR -->
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-
-    <!-- CONTEÚDO -->
     <div class="flex-grow-1 p-4">
-
-        <div th:replace="~{fragments/topbar :: topbar(${book != null ? 'Editar Livro' : 'Novo Livro'})}"></div>
-
-        <!-- ERRO -->
+        <div th:replace="~{fragments/topbar :: topbar(${book != null && book.id != null ? 'Editar Livro' : 'Novo Livro'})}"></div>
         <div th:if="${error}" class="alert alert-danger">
             <span th:text="${error}"></span>
         </div>
-
         <div class="card shadow-sm">
             <div class="card-body">
-
                 <form th:action="@{/books}" method="post">
-
                     <input type="hidden" name="id" th:value="${book != null ? book.id : ''}">
-
-                    <!-- TÍTULO -->
                     <div class="mb-3">
                         <label class="form-label">Título</label>
                         <input type="text" name="title" class="form-control" th:value="${book != null ? book.title : ''}">
                     </div>
-
-                    <!-- AUTOR -->
                     <div class="mb-3">
                         <label class="form-label">Autor</label>
                         <input type="text" name="author" class="form-control" th:value="${book != null ? book.author : ''}">
                     </div>
-
-                    <!-- PSICOGRAFADO -->
                     <div class="mb-3">
-                        <label class="form-label">Psicografado por</label>
+                        <label class="form-label">Psicografado Por</label>
                         <input type="text" name="psychographedBy" class="form-control" th:value="${book != null ? book.psychographedBy : ''}">
                     </div>
-
-                    <!-- CATEGORIA -->
-                    <div class="mb-3">
-                        <label class="form-label">Categoria</label>
-                        <input type="text" name="category" class="form-control" th:value="${book != null ? book.category : ''}">
-                    </div>
-
-                    <!-- BOTÕES -->
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Salvar</button>
                         <a href="/books" class="btn btn-secondary">Cancelar</a>
                     </div>
-
                 </form>
-
             </div>
         </div>
-
     </div>
-
 </div>
-
 </body>
 </html>
