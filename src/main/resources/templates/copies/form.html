@@ -1,187 +1,109 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
-
 <head th:replace="~{fragments/head :: head('Novo Exemplar')}"></head>
-
 <body class="bg-light">
-
 <div class="d-flex">
-
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-
     <div class="flex-grow-1 p-4">
-
         <div th:replace="~{fragments/topbar :: topbar('Novo Exemplar')}"></div>
-
         <div th:if="${error}" class="alert alert-danger">
             <span th:text="${error}"></span>
         </div>
-
         <div class="card shadow-sm">
-
             <div class="card-body">
-
                 <form th:action="@{/copies}" method="post">
-
                     <div class="mb-3">
-
                         <label class="form-label">Livro</label>
-
                         <input type="text"
                                id="bookSearch"
                                class="form-control"
                                placeholder="Pesquisar livro..."
                                autocomplete="off">
-
                         <input type="hidden"
                                name="bookId"
                                id="selectedBookId"
                                required>
-
                         <div id="bookResults"
                              class="list-group mt-2"
                              style="max-height:250px;overflow-y:auto;display:none;">
-
-                            <button type="button"
-                                    class="list-group-item list-group-item-action book-item"
+                            <button type="button" class="list-group-item list-group-item-action book-item"
                                     th:each="bookItem : ${books}"
                                     th:text="${bookItem.title + ' - ' + bookItem.author}"
                                     th:attr="data-id=${bookItem.id},data-title=${bookItem.title}">
                             </button>
-
                         </div>
-
                         <div id="selectedBookText"
                              class="form-text text-success mt-2">
                         </div>
-
                     </div>
-
                     <div class="mb-3">
-
                         <label class="form-label">Prateleira</label>
-
                         <select name="shelfPositionId" class="form-select">
-
                             <option value="">Selecione uma prateleira</option>
-
                             <option th:each="position : ${positions}"
                                     th:value="${position.id}"
                                     th:text="${position.fullPosition}">
                             </option>
-
                         </select>
-
                     </div>
-
                     <div class="mb-3">
-
                         <label class="form-label">Código do Exemplar</label>
-
-                        <input type="text"
-                               name="code"
-                               class="form-control"
-                               placeholder="Opcional">
-
+                        <input type="text" name="code" class="form-control" placeholder="Opcional">
                     </div>
-
                     <div class="d-flex gap-2">
-
                         <button type="submit" class="btn btn-primary">Salvar</button>
-
                         <a href="/copies" class="btn btn-secondary">Cancelar</a>
-
                     </div>
-
                 </form>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
-
 <script>
-
     function normalize(text) {
-
         return text
             .normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
             .toLowerCase();
-
     }
-
     const searchInput = document.getElementById('bookSearch');
     const results = document.getElementById('bookResults');
     const hiddenInput = document.getElementById('selectedBookId');
     const selectedText = document.getElementById('selectedBookText');
-
     const items = document.querySelectorAll('.book-item');
-
     searchInput.addEventListener('input', () => {
-
         const value = normalize(searchInput.value);
-
         if (value.length === 0) {
             results.style.display = 'none';
             return;
         }
-
         let hasVisible = false;
-
         items.forEach(item => {
-
             const text = normalize(item.innerText);
-
             if (text.includes(value)) {
-
                 item.style.display = 'block';
                 hasVisible = true;
-
             } else {
-
                 item.style.display = 'none';
-
             }
-
         });
-
         results.style.display = hasVisible ? 'block' : 'none';
-
     });
-
     items.forEach(item => {
-
         item.addEventListener('click', () => {
-
             hiddenInput.value = item.dataset.id;
-
             searchInput.value = item.dataset.title;
-
             selectedText.innerText =
                 'Livro selecionado: ' + item.dataset.title;
-
             results.style.display = 'none';
-
         });
-
     });
-
     document.addEventListener('click', (event) => {
-
         if (!results.contains(event.target)
             && event.target !== searchInput) {
-
             results.style.display = 'none';
-
         }
-
     });
-
 </script>
-
 </body>
 </html>
