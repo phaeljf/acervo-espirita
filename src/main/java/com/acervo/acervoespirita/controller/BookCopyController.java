@@ -41,19 +41,28 @@ public class BookCopyController {
 
     // Form novo exemplar
     @GetMapping("/new")
-    public String newCopy(@RequestParam Long bookId, HttpSession session, Model model) {
+    public String newCopy(@RequestParam(required = false) Long bookId,
+                          HttpSession session,
+                          Model model) {
+
         if (!sessionService.isLogged(session)) {
             return "redirect:/";
         }
 
-        Book book = bookService.findById(bookId);
         User loggedUser = sessionService.getLoggedUser(session);
 
         model.addAttribute("loggedUser", loggedUser);
         model.addAttribute("positions", shelfPositionService.findAll());
         model.addAttribute("copy", new BookCopy());
-        model.addAttribute("book", book);
-        model.addAttribute("selectedBookId", bookId);
+        model.addAttribute("books", bookService.findAll());
+
+        if (bookId != null) {
+
+            Book book = bookService.findById(bookId);
+
+            model.addAttribute("book", book);
+            model.addAttribute("selectedBookId", bookId);
+        }
 
         return "copies/form";
     }

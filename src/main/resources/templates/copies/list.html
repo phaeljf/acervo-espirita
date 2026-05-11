@@ -1,38 +1,95 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Exemplares')}"></head>
+
 <body class="bg-light">
+
 <div class="d-flex">
+
     <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
     <div class="flex-grow-1 p-4">
+
         <div th:replace="~{fragments/topbar :: topbar('Exemplares')}"></div>
+
         <div class="card shadow-sm">
+
             <div class="card-body">
-                <table class="table table-hover">
+
+                <div class="d-flex gap-2 mb-3">
+
+                    <a href="/copies/new" class="btn btn-primary"> Adicionar Exemplar </a>
+
+                    <form method="get" th:action="@{/copies}" class="d-flex gap-2">
+
+                        <input type="text"
+                               name="search"
+                               class="form-control"
+                               placeholder="Pesquisar livro..."
+                               style="max-width:350px;"
+                               th:value="${search}">
+
+                        <button type="submit" class="btn btn-secondary"> Buscar </button>
+
+                    </form>
+
+                </div>
+
+                <table class="table table-hover align-middle">
+
                     <thead>
+
                     <tr>
                         <th>Livro</th>
                         <th>Autor</th>
                         <th>Exemplares</th>
                         <th>Ações</th>
                     </tr>
+
                     </thead>
+
                     <tbody>
-                    <tr th:each="book : ${books}">
-                        <td th:text="${book.title}"></td>
-                        <td th:text="${book.author}"></td>
-                        <td th:text="${book.totalCopies}"></td>
-                        <td>
-                            <div class="d-flex gap-2">
-                                <a th:href="@{/copies/book/{id}(id=${book.id})}" class="btn btn-sm btn-info">Gerenciar Exemplares</a>
-                            </div>
+
+                    <tr th:if="${#lists.isEmpty(books)}">
+                        <td colspan="4" class="text-center py-4">
+                            Nenhum livro encontrado.
                         </td>
                     </tr>
+
+                    <tr th:each="book : ${books}">
+
+                        <td th:text="${book.title}"></td>
+
+                        <td th:text="${book.author}"></td>
+
+                        <td th:text="${book.totalCopies}"></td>
+
+                        <td>
+
+                            <div class="d-flex gap-2">
+
+                                <a th:href="@{/copies/book/{id}(id=${book.id})}"
+                                   class="btn btn-sm btn-info">
+                                    Exemplares
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
                     </tbody>
+
                 </table>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
+
 </body>
 </html>

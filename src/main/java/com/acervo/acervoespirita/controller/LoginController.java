@@ -14,22 +14,51 @@ public class LoginController {
     private final UserService userService;
     private final SessionService sessionService;
 
-    public LoginController(UserService userService, SessionService sessionService) {
+    public LoginController(
+            UserService userService,
+            SessionService sessionService
+    ) {
         this.userService = userService;
         this.sessionService = sessionService;
     }
 
     @GetMapping("/")
-    public String loginPage(Model model) {
+    public String loginPage(
+            HttpSession session,
+            Model model
+    ) {
+
+        if (sessionService.isLogged(session)) {
+            return "redirect:/dashboard";
+        }
+
         return "login";
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String username, HttpSession session) {
+    public String login(
+            @RequestParam String username,
+            HttpSession session,
+            Model model
+    ) {
 
-        User user = userService.findByUsername(username);
-        sessionService.login(session, user);
-        return "redirect:/dashboard";
+        try {
+
+            User user = userService.findByUsername(username);
+
+            sessionService.login(session, user);
+
+            return "redirect:/dashboard";
+
+        } catch (Exception e) {
+
+            model.addAttribute(
+                    "error",
+                    e.getMessage()
+            );
+
+            return "login";
+        }
     }
 
     @GetMapping("/logout")
@@ -39,4 +68,5 @@ public class LoginController {
 
         return "redirect:/";
     }
+
 }

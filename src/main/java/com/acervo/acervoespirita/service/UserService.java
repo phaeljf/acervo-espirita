@@ -48,9 +48,9 @@ public class UserService {
         return savedUser;
     }
 
-    // Atualiza dados básicos do usuário
+    //Atualiza usuario
     @Transactional
-    public User updateUser(Long id,String name,String email,String phone,User updatedBy) {
+    public User updateUser(Long id, String name, String email, String phone, UserRole role, User updatedBy) {
 
         User user = findById(id);
 
@@ -65,49 +65,36 @@ public class UserService {
         user.setEmail(email);
         user.setPhone(phone);
 
-        User updatedUser = userRepository.save(user);
+        if (role != null
+                && updatedBy.isAdmin()
+                && role != user.getRole()) {
 
-        logService.register(
-                LogType.USER_UPDATED,
-                updatedBy,
-                "Usuário " + updatedUser.getUsername() + " foi atualizado."
-        );
+            UserRole oldRole = user.getRole();
 
-        return updatedUser;
-    }
+            user.changeRole(role);
 
-    // Altera a role do usuário
-    @Transactional
-    public User changeUserRole(
-            Long id,
-            UserRole newRole,
-            User changedBy
-    ) {
-        if (!changedBy.isAdmin()) {
-            throw new IllegalStateException(
-                    "Apenas administradores podem alterar roles."
-            );
+            logService.register(LogType.USER_ROLE_UPDATED,
+                    updatedBy,
+                    "Role do usuário "
+                            + user.getUsername()
+                            + " alterada de "
+                            + oldRole
+                            + " para "
+                            + role
+                            + ".");
         }
 
-        User user = findById(id);
-        UserRole oldRole = user.getRole();
-        user.changeRole(newRole);
         User updatedUser = userRepository.save(user);
 
-        logService.register(
-                LogType.USER_ROLE_UPDATED,
-                changedBy,
-                "Role do usuário "
+        logService.register(LogType.USER_UPDATED,
+                updatedBy,
+                "Usuário "
                         + updatedUser.getUsername()
-                        + " alterada de "
-                        + oldRole
-                        + " para "
-                        + newRole
-                        + "."
-        );
+                        + " foi atualizado.");
 
         return updatedUser;
     }
+
 
     // Inativa usuário
     @Transactional

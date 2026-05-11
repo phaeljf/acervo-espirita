@@ -1,0 +1,134 @@
+<!-- users/list.html -->
+
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Usuários')}"></head>
+
+<body class="bg-light">
+
+<div class="d-flex min-vh-100">
+
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="flex-grow-1 p-4">
+
+        <div th:replace="~{fragments/topbar :: topbar('Usuários')}"></div>
+
+        <div class="mb-4">
+
+            <div class="d-flex gap-2 mb-3">
+
+                <a href="/users/new" class="btn btn-primary"> Novo Usuário </a>
+
+                <form method="get" th:action="@{/users}" class="d-flex gap-2">
+
+                    <input type="text"
+                           name="search"
+                           class="form-control"
+                           placeholder="Pesquisar usuário..."
+                           style="max-width:350px;"
+                           th:value="${search}">
+
+                    <button type="submit" class="btn btn-secondary"> Buscar </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="card shadow-sm">
+
+            <div class="card-body p-0">
+
+                <div style="max-height:75vh;overflow-y:auto;">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+
+                        <tr>
+                            <th>Nome</th>
+                            <th>Usuário</th>
+                            <th>Cargo</th>
+                            <th>Status</th>
+                            <th style="width:320px;">Ações</th>
+                        </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        <tr th:if="${search == null || search.isBlank()}">
+                            <td colspan="5" class="text-center text-muted py-4">
+                                Pesquise um usuário para visualizar os resultados.
+                            </td>
+                        </tr>
+
+                        <tr th:if="${search != null && !search.isBlank() && #lists.isEmpty(users)}">
+                            <td colspan="5" class="text-center text-muted py-4">
+                                Nenhum usuário encontrado.
+                            </td>
+                        </tr>
+
+                        <tr th:each="user : ${users}">
+
+                            <td th:text="${user.name}"></td>
+
+                            <td th:text="${user.username}"></td>
+
+                            <td>
+
+                                <span th:if="${user.role.name() == 'USER'}" class="badge bg-secondary"> USER </span>
+                                <span th:if="${user.role.name() == 'STAFF'}" class="badge bg-primary"> STAFF </span>
+                                <span th:if="${user.role.name() == 'ADMIN'}" class="badge bg-danger"> ADMIN </span>
+
+                            </td>
+
+                            <td>
+
+                                <span th:if="${user.active}" class="badge bg-success"> ATIVO </span>
+                                <span th:if="${!user.active}" class="badge bg-secondary"> INATIVO </span>
+
+                            </td>
+
+                            <td>
+
+                                <div class="d-flex gap-2">
+
+                                    <a th:href="@{/users/{id}(id=${user.id})}" class="btn btn-sm btn-outline-primary"> Visualizar </a>
+
+                                    <a th:href="@{/users/{id}/edit(id=${user.id})}" class="btn btn-sm btn-warning"> Editar </a>
+
+                                    <form th:if="${user.active}" th:action="@{/users/{id}/deactivate(id=${user.id})}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-danger"> Inativar </button>
+                                    </form>
+
+                                    <form th:if="${!user.active}" th:action="@{/users/{id}/reactivate(id=${user.id})}" method="post">
+                                        <button type="submit" class="btn btn-sm btn-success"> Reativar </button>
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

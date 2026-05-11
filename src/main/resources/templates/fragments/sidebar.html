@@ -1,43 +1,104 @@
 <div th:fragment="sidebar"
-     class="bg-primary text-white p-3"
-     style="width: 250px; min-height: 100vh;">
-
-    <div class="text-center mb-4">
-
-        <img src="/img/logo.jpg"
-             width="110"
-             class="rounded shadow-sm mb-3">
-
-        <h4 class="fw-bold">
-            GEAL
-        </h4>
-
-        <p style="font-size: 14px;">
-            Acervo Espírita
-        </p>
-
+     class="text-white px-3 pt-3 pb-2 d-flex flex-column"
+     style="width:250px;height:100vh;overflow-y:auto;box-sizing:border-box;background:#4679d6;">
+    <div>
+        <div class="text-center mb-4" border = 1>
+            <img src="/img/logo.jpg"
+                 width="110"
+                 class="img-fluid rounded shadow-sm mb-3">
+            <h4 class="fw-bold mb-1"> GEAL </h4>
+            <p class="mb-0"
+               style="font-size:14px;color:rgba(255,255,255,0.80);">
+                Acervo Espírita
+            </p>
+        </div>
+        <hr style="border-color:rgba(255,255,255,0.20);">
+        <div class="small fw-bold text-uppercase mb-2"
+             style="color:rgba(255,255,255,0.65);">
+            GERAL
+        </div>
+        <ul class="nav flex-column mb-2">
+            <li class="nav-item mb-1">
+                <a class="nav-link sidebar-link" href="/dashboard">
+                    🏠 Dashboard
+                </a>
+            </li>
+        </ul>
+        <div class="small fw-bold text-uppercase mb-2"
+             style="color:rgba(255,255,255,0.65);">
+            ACERVO
+        </div>
+        <ul class="nav flex-column mb-2">
+            <li class="nav-item mb-1">
+                <a class="nav-link sidebar-link" href="/books">
+                    📚 Livros
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a class="nav-link sidebar-link" href="/copies">
+                    📦 Exemplares
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a class="nav-link sidebar-link" href="/locations">
+                    📍 Localizações
+                </a>
+            </li>
+        </ul>
+        <div class="small fw-bold text-uppercase mb-2"
+             style="color:rgba(255,255,255,0.65);">
+            EMPRÉSTIMOS
+        </div>
+        <ul class="nav flex-column mb-2">
+            <li class="nav-item mb-1">
+                <a class="nav-link sidebar-link" href="/loan">
+                    🔄 Empréstimos
+                </a>
+            </li>
+        </ul>
+        <div class="small fw-bold text-uppercase mb-2"
+             style="color:rgba(255,255,255,0.65);">
+            PESSOAS
+        </div>
+        <ul class="nav flex-column mb-2">
+            <li class="nav-item mb-1">
+                <a class="nav-link sidebar-link" href="/users">
+                    👤 Usuários
+                </a>
+            </li>
+        </ul>
+        <div th:if="${loggedUser.admin}">
+            <div class="small fw-bold text-uppercase mb-2"
+                 style="color:rgba(255,255,255,0.65);">
+                SISTEMA
+            </div>
+            <ul class="nav flex-column mb-2">
+                <li class="nav-item mb-1">
+                    <a class="nav-link sidebar-link" href="/configuration">
+                        ⚙ Configurações
+                    </a>
+                </li>
+                <li class="nav-item mb-1">
+                    <a class="nav-link sidebar-link" href="/reports">
+                        📊 Relatórios
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
-
-    <hr>
-
-    <ul class="nav flex-column">
-
-        <li class="nav-item mb-2">
-            <a class="nav-link text-white" href="/dashboard"> Início </a>
-        </li>
-        <li class="nav-item mb-2">
-            <a class="nav-link text-white" href="/loan"> Empréstimos </a>
-        </li>
-        <li class="nav-item mb-2">
-            <a class="nav-link text-white" href="/books">Livros </a>
-        </li>
-        <li class="nav-item mb-2">
-            <a class="nav-link text-white" href="/copies"> Exemplares </a>
-        </li>
-        <li class="nav-item mb-2">
-            <a class="nav-link text-white" href="/locations"> Localização </a>
-        </li>
-
-    </ul>
-
+    <div class="pt-3">
+        <hr style="border-color:rgba(255,255,255,0.20);">
+        <div class="d-flex align-items-center justify-content-between gap-2">
+            <div>
+                <div class="fw-bold small"
+                     th:text="${loggedUser.name}">
+                </div>
+                <div>
+                    <span th:if="${loggedUser.role.name() == 'ADMIN'}"class="badge bg-danger"> ADMIN</span>
+                    <span th:if="${loggedUser.role.name() == 'STAFF'}"class="badge bg-light text-primary">STAFF</span>
+                </div>
+            </div>
+            <a href="/logout"class="btn btn-sm btn-danger">Sair</a>
+        </div>
+    </div>
 </div>
