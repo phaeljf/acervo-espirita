@@ -47,11 +47,8 @@ public class LoanItemService {
         boolean allReturned = loan.getItems().stream().allMatch(LoanItem::isReturned);
 
         if (allReturned) {
-
             loan.close(observation);
-
             loanRepository.save(loan);
-
             logService.register(LogType.LOAN_CLOSED, handledBy, "Empréstimo #" + loan.getId() + " foi encerrado.");
         }
 

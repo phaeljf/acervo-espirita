@@ -59,7 +59,7 @@ public class TestDataRunner implements CommandLineRunner {
                         .username("rapha")
                         .email("rapha@acervo.com")
                         .phone("31777777777")
-                        .role(UserRole.USER)
+                        .role(UserRole.STAFF)
                         .build(),
                 admin
         );
@@ -178,10 +178,5 @@ public class TestDataRunner implements CommandLineRunner {
                 staff
         );
 
-        loanService.createLoan(
-                user.getId(),
-                List.of(4L, 5L),
-                admin
-        );
     }
 }

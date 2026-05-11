@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Novo Empréstimo')}"></head>
+
+<body class="bg-light">
+
+<div class="d-flex min-vh-100">
+
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="flex-grow-1 p-4">
+
+        <div th:replace="~{fragments/topbar :: topbar('Novo Empréstimo')}"></div>
+
+        <form th:action="@{/loan}" method="post" id="loanForm">
+            <input type="hidden"
+                   name="userId"
+                   id="userIdField">
+
+            <div id="hiddenBookInputs"></div>
+
+            <div class="row g-4">
+
+                <div class="col-lg-8">
+
+                    <div class="card shadow-sm">
+
+                        <div class="card-body">
+
+                            <div id="userSection">
+
+                                <h4 class="fw-bold mb-4">
+                                    Pesquisar Usuário
+                                </h4>
+
+                                <label class="form-label fw-bold">
+                                    Pesquisar Usuário
+                                </label>
+
+                                <input type="text"
+                                       id="userInput"
+                                       class="form-control mb-3"
+                                       placeholder="Digite o nome do usuário...">
+
+                                <div id="userError"
+                                     class="alert alert-danger mt-3"
+                                     style="display:none;">
+                                </div>
+
+                                <div id="userList"
+                                     class="border rounded"
+                                     style="display:none;">
+                                </div>
+
+                            </div>
+
+                            <div id="bookSection" style="display:none;">
+
+                                <h4 class="fw-bold mb-4">
+                                    Pesquisar Livro
+                                </h4>
+
+                                <label class="form-label fw-bold">
+                                    Pesquisar Livro
+                                </label>
+
+                                <input type="text"
+                                       id="bookInput"
+                                       class="form-control mb-3"
+                                       placeholder="Digite o nome do livro...">
+
+                                <div id="copiesContainer" class="border rounded">
+
+                                    <div class="row fw-bold border-bottom p-3 bg-light mx-0">
+
+                                        <div class="col-5">
+                                            Livro
+                                        </div>
+
+                                        <div class="col-2">
+                                            Código
+                                        </div>
+
+                                        <div class="col-3">
+                                            Localização
+                                        </div>
+
+                                        <div class="col-2 text-end">
+                                            Ação
+                                        </div>
+
+                                    </div>
+
+                                    <div id="copiesResults"></div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-4">
+
+                    <div class="card shadow-sm sticky-top" style="top:20px;">
+
+                        <div class="card-body">
+
+                            <h4 class="fw-bold mb-4">
+                                Empréstimo
+                            </h4>
+
+                            <div class="mb-4">
+
+                                <div class="small text-muted">
+                                    Usuário
+                                </div>
+
+                                <div id="selectedUser" class="fw-bold">
+                                    Nenhum usuário selecionado
+                                </div>
+
+                                <div class="mt-2">
+
+                                    <button type="button"
+                                            id="changeUserButton"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            style="display:none;">
+                                        Trocar Usuário
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            <div class="mb-4">
+
+                                <div class="small text-muted mb-2">
+                                    Livros
+                                </div>
+
+                                <div id="selectedBooksArea"
+                                     class="border rounded p-2 text-muted small">
+                                    Nenhum livro adicionado.
+                                </div>
+
+                            </div>
+
+                            <div class="mb-4">
+
+                                <div class="small text-muted">
+                                    Quantidade
+                                </div>
+
+                                <div id="booksQuantity" class="fw-bold">
+                                    0 livro(s)
+                                </div>
+
+                            </div>
+
+                            <div class="mb-4">
+
+                                <div class="small text-muted">
+                                    Prazo Previsto
+                                </div>
+
+                                <div class="fw-bold">
+                                    10/07/2026
+                                </div>
+
+                            </div>
+
+                            <button type="submit"
+                                    id="finishButton"
+                                    class="btn btn-success w-100">
+                                Finalizar Empréstimo
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- USERS DATA -->
+
+<div id="usersData" style="display:none;">
+
+    <div th:each="user : ${users}"
+         class="user-data"
+         th:attr="
+            data-id=${user.id},
+            data-name=${user.name},
+            data-username=${user.username},
+            data-has-loan=${user.hasActiveLoan()}">
+    </div>
+
+</div>
+
+<!-- COPIES DATA -->
+
+<div id="copiesData" style="display:none;">
+
+    <div th:each="copy : ${copies}"
+         class="copy-data"
+         th:attr="
+            data-id=${copy.id},
+            data-title=${copy.book.title},
+            data-code=${copy.code},
+            data-location=${copy.shelfPosition != null ? copy.shelfPosition.shelf.room.name + ' > ' + copy.shelfPosition.shelf.name + ' > ' + copy.shelfPosition.name : 'Sem localização'}">
+    </div>
+
+</div>
+
+<script>
+
+    const users = [];
+
+    document.querySelectorAll('.user-data').forEach(user=>{
+
+        users.push({
+            id:user.dataset.id,
+            name:user.dataset.name,
+            username:user.dataset.username,
+            hasLoan:user.dataset.hasLoan === 'true'
+        });
+
+    });
+
+    const copies = [];
+
+    document.querySelectorAll('.copy-data').forEach(copy=>{
+
+        copies.push({
+            id:copy.dataset.id,
+            title:copy.dataset.title,
+            code:copy.dataset.code || 'Sem código',
+            location:copy.dataset.location
+        });
+
+    });
+
+    const userInput=document.getElementById('userInput');
+
+    const userList=document.getElementById('userList');
+
+    const userSection=document.getElementById('userSection');
+
+    const bookSection=document.getElementById('bookSection');
+
+    const selectedUser=document.getElementById('selectedUser');
+
+    const changeUserButton=document.getElementById('changeUserButton');
+
+    const bookInput=document.getElementById('bookInput');
+
+    const copiesResults=document.getElementById('copiesResults');
+
+    const booksArea=document.getElementById('selectedBooksArea');
+
+    const booksQuantity=document.getElementById('booksQuantity');
+
+    let selectedBooks=[];
+
+    let selectedUserId=null;
+
+    userInput.addEventListener('input',function(){
+
+        document.getElementById('userError').style.display='none';
+
+        const value=this.value.toLowerCase().trim();
+
+        userList.innerHTML='';
+
+        if(value.length===0){
+
+            userList.style.display='none';
+
+            return;
+
+        }
+
+        const filtered=users.filter(user =>
+            user.name.toLowerCase().includes(value)
+        );
+
+        if(filtered.length===0){
+
+            userList.style.display='block';
+
+            userList.innerHTML=`
+<div class="p-3 text-muted">
+Nenhum usuário encontrado.
+</div>
+`;
+
+            return;
+
+        }
+
+        userList.style.display='block';
+
+        filtered.forEach(user=>{
+
+            userList.innerHTML+=`
+<div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+
+<div>
+
+<div class="fw-bold">${user.name}</div>
+
+<div class="small text-muted">${user.username}</div>
+
+</div>
+
+<button type="button"
+class="btn btn-primary btn-sm select-user-btn"
+data-id="${user.id}"
+data-name="${user.name}">
+Selecionar
+</button>
+
+</div>
+`;
+
+        });
+
+        refreshUserButtons();
+
+    });
+
+    function refreshUserButtons(){
+
+        document.querySelectorAll('.select-user-btn').forEach(button=>{
+
+            button.addEventListener('click',function(){
+
+                const selected=users.find(user =>
+                    user.id===this.dataset.id
+                );
+
+                if(selected.hasLoan){
+
+                    const error=document.getElementById('userError');
+
+                    error.style.display='block';
+
+                    error.innerText='Usuário já possui empréstimo ativo.';
+
+                    return;
+
+                }
+
+                selectedUserId=this.dataset.id;
+
+                selectedUser.innerText=this.dataset.name;
+
+                updateHiddenInputs();
+
+                userSection.style.display='none';
+
+                bookSection.style.display='block';
+
+                changeUserButton.style.display='inline-block';
+
+            });
+
+        });
+
+    }
+
+    bookInput.addEventListener('input',function(){
+
+        const value=this.value.toLowerCase().trim();
+
+        copiesResults.innerHTML='';
+
+        if(value.length===0){
+
+            return;
+
+        }
+
+        const filtered=copies.filter(copy =>
+            copy.title.toLowerCase().includes(value)
+        );
+
+        if(filtered.length===0){
+
+            copiesResults.innerHTML=`
+<div class="p-3 text-muted">
+Nenhum exemplar disponível.
+</div>
+`;
+
+            return;
+
+        }
+
+        filtered.forEach(copy=>{
+
+            copiesResults.innerHTML+=`
+<div class="row align-items-center p-3 border-bottom mx-0">
+
+<div class="col-5">
+
+<div class="fw-bold">${copy.title}</div>
+
+</div>
+
+<div class="col-2">
+
+<div class="small text-muted">${copy.code}</div>
+
+</div>
+
+<div class="col-3">
+
+<div class="small text-muted">${copy.location}</div>
+
+</div>
+
+<div class="col-2 text-end">
+
+<button type="button"
+class="btn btn-primary btn-sm add-button"
+data-id="${copy.id}"
+data-title="${copy.title}"
+data-code="${copy.code}">
+Adicionar
+</button>
+
+</div>
+
+</div>
+`;
+
+        });
+
+        refreshAddButtons();
+
+    });
+
+    function refreshAddButtons(){
+
+        document.querySelectorAll('.add-button').forEach(button=>{
+
+            button.addEventListener('click',function(){
+
+                const id=this.dataset.id;
+
+                const title=this.dataset.title;
+
+                const code=this.dataset.code;
+
+                if(selectedBooks.some(book=>book.code===code)){
+
+                    return;
+
+                }
+
+                selectedBooks.push({
+                    id:id,
+                    title:title,
+                    code:code || 'Sem código'
+                });
+
+                renderBooks();
+
+                updateHiddenInputs();
+
+                this.classList.remove('btn-primary');
+
+                this.classList.add('btn-success');
+
+                this.innerText='Adicionado';
+
+                this.disabled=true;
+
+            });
+
+        });
+
+    }
+
+    function renderBooks(){
+
+        if(selectedBooks.length===0){
+
+            booksArea.innerHTML='Nenhum livro adicionado.';
+
+            booksQuantity.innerText='0 livro(s)';
+
+            return;
+
+        }
+
+        let html='';
+
+        selectedBooks.forEach(book=>{
+
+            html+=`
+<div class="d-flex justify-content-between align-items-center border-bottom py-2">
+
+<div>
+
+<div class="fw-bold">${book.title}</div>
+
+<div class="small text-muted">${book.code}</div>
+
+</div>
+
+<button type="submit"
+class="btn btn-sm btn-outline-danger remove-book-btn"
+data-code="${book.code}">
+✕
+</button>
+
+</div>
+`;
+
+        });
+
+        booksArea.innerHTML=html;
+
+        booksQuantity.innerText=selectedBooks.length+' livro(s)';
+
+        refreshRemoveButtons();
+
+    }
+
+    function refreshRemoveButtons(){
+
+        document.querySelectorAll('.remove-book-btn').forEach(button=>{
+
+            button.addEventListener('click',function(){
+
+                const code=this.dataset.code;
+
+                selectedBooks=selectedBooks.filter(book =>
+                    book.code!==code
+                );
+
+                document.querySelectorAll('.add-button').forEach(addButton=>{
+
+                    if(addButton.dataset.code===code){
+
+                        addButton.classList.remove('btn-success');
+
+                        addButton.classList.add('btn-primary');
+
+                        addButton.innerText='Adicionar';
+
+                        addButton.disabled=false;
+
+                    }
+
+                });
+
+                renderBooks();
+
+            });
+
+        });
+
+    }
+
+    changeUserButton.addEventListener('click',function(){
+
+        selectedBooks=[];
+
+        selectedUserId=null;
+
+        renderBooks();
+
+        selectedUser.innerText='Nenhum usuário selecionado';
+
+        userSection.style.display='block';
+
+        bookSection.style.display='none';
+
+        userInput.value='';
+
+        userList.innerHTML='';
+
+        userList.style.display='none';
+
+        bookInput.value='';
+
+        copiesResults.innerHTML='';
+
+        this.style.display='none';
+
+    });
+
+
+    function updateHiddenInputs(){
+
+        document.getElementById('userIdField').value=selectedUserId || '';
+
+        const container=document.getElementById('hiddenBookInputs');
+
+        container.innerHTML='';
+
+        selectedBooks.forEach(book=>{
+
+            container.innerHTML+=`
+        <input type="hidden"
+        name="bookCopyIds"
+        value="${book.id}">
+        `;
+
+        });
+
+    }
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,172 @@
+<!-- return.html -->
+
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head('Devolução')}"></head>
+
+<body class="bg-light">
+
+<div class="d-flex min-vh-100">
+
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="flex-grow-1 p-4">
+
+        <div th:replace="~{fragments/topbar :: topbar('Devolução Empréstimo Nº ' + ${loan.id})}"></div>
+
+        <div class="d-flex gap-2 mb-3">
+
+            <a th:href="@{/loan/{id}(id=${loan.id})}" class="btn btn-outline-secondary btn-sm">
+                ← Voltar para Visualização
+            </a>
+
+        </div>
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-body">
+
+                <div class="row g-4">
+
+                    <div class="col-md-4">
+                        <div class="small text-muted"> Usuário </div>
+                        <div class="fw-bold" th:text="${loan.user.name}"></div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="small text-muted"> Funcionário </div>
+                        <div class="fw-bold" th:text="${loan.handledBy.name}"></div>
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="small text-muted"> Status </div>
+
+                        <span th:if="${loan.active}" class="badge bg-primary"> ABERTO </span>
+
+                        <span th:if="${loan.closed}" class="badge bg-success"> FINALIZADO </span>
+
+                        <span th:if="${loan.overdue}" class="badge bg-danger"> ATRASADO </span>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="small text-muted"> Data Empréstimo </div>
+
+                        <div class="fw-bold" th:text="${#temporals.format(loan.loanDate.atZone(T(java.time.ZoneId).systemDefault()), 'dd/MM/yyyy HH:mm')}"></div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="small text-muted"> Vencimento </div>
+
+                        <div class="fw-bold" th:text="${#temporals.format(loan.dueDate, 'dd/MM/yyyy')}"></div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="small text-muted"> Quantidade </div>
+
+                        <div class="fw-bold" th:text="${loan.items.size() + ' livro(s)'}"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card shadow-sm">
+
+            <div class="card-body p-0">
+
+                <table class="table align-middle mb-0">
+
+                    <thead class="table-light">
+
+                    <tr>
+
+                        <th>Livro</th>
+                        <th>Exemplar</th>
+                        <th>Localização</th>
+                        <th>Status</th>
+                        <th>Devolvido em</th>
+                        <th style="width:320px;">Ações</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    <tr th:each="item : ${loan.items}">
+
+                        <td th:text="${item.bookCopy.book.title}"></td>
+
+                        <td th:text="${item.bookCopy.code}"></td>
+
+                        <td th:text="${item.bookCopy.shelfPosition != null ? item.bookCopy.shelfPosition.shelf.room.name + ' > ' + item.bookCopy.shelfPosition.shelf.name + ' > ' + item.bookCopy.shelfPosition.name : 'Emprestado'}"></td>
+
+                        <td>
+
+                            <span th:if="${item.returned}" class="badge bg-secondary"> DEVOLVIDO </span>
+
+                            <span th:if="${!item.returned}" class="badge bg-warning text-dark"> PENDENTE </span>
+
+                        </td>
+
+                        <td th:text="${item.returnDate != null ? #temporals.format(item.returnDate, 'dd/MM/yyyy') : '-'}"></td>
+
+                        <td>
+
+                            <form th:if="${!item.returned}" th:action="@{/loan-items/{id}/return(id=${item.id})}" method="post" class="d-flex gap-2">
+
+                                <select name="shelfPositionId" class="form-select form-select-sm" required>
+
+                                    <option value="">Prateleira</option>
+
+                                    <option th:each="position : ${positions}"
+                                            th:value="${position.id}"
+                                            th:text="${position.shelf.room.name + ' > ' + position.shelf.name + ' > ' + position.name}">
+                                    </option>
+
+                                </select>
+
+                                <button type="submit" class="btn btn-sm btn-success"> Devolver </button>
+
+                            </form>
+
+                            <span th:if="${item.returned}" class="text-success small fw-bold">
+Item devolvido
+</span>
+
+                        </td>
+
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(loan.items)}">
+
+                        <td colspan="6" class="text-center text-muted py-4"> Nenhum item encontrado. </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

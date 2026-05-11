@@ -40,9 +40,13 @@ public class Loan implements Serializable {
     @Column(nullable = false)
     private LoanStatus status;
 
+    @Column(nullable = false)
     private Instant loanDate;
 
+    @Column(nullable = false)
     private LocalDate dueDate;
+
+    private Instant closedAt;
 
     @Column(length = 1000)
     private String observation;
@@ -69,7 +73,10 @@ public class Loan implements Serializable {
             this.dueDate = LocalDate.of(2099, 12, 31);
         } else {
             // Usa a data do empréstimo (convertida para LocalDate) como base
-            this.dueDate = LocalDate.now().plusDays(config.getLoanDaysLimit());
+            this.dueDate = loanDate
+                    .atZone(java.time.ZoneId.systemDefault())
+                    .toLocalDate()
+                    .plusDays(config.getLoanDaysLimit());
         }
     }
 
@@ -92,6 +99,11 @@ public class Loan implements Serializable {
     public void close(String observation) {
         this.status = LoanStatus.CLOSED;
         this.observation = observation;
+        this.closedAt = Instant.now();
+    }
+
+    public boolean isClosed() {
+        return closedAt != null;
     }
 
     //Equals e Hashcode

@@ -1,16 +1,9 @@
 package com.acervo.acervoespirita.service;
 
-import com.acervo.acervoespirita.model.BookCopy;
-import com.acervo.acervoespirita.model.Configuration;
-import com.acervo.acervoespirita.model.Loan;
-import com.acervo.acervoespirita.model.LoanItem;
-import com.acervo.acervoespirita.model.User;
+import com.acervo.acervoespirita.model.*;
 import com.acervo.acervoespirita.model.enums.LogType;
 import com.acervo.acervoespirita.model.enums.LoanStatus;
-import com.acervo.acervoespirita.repository.BookCopyRepository;
-import com.acervo.acervoespirita.repository.LoanItemRepository;
-import com.acervo.acervoespirita.repository.LoanRepository;
-import com.acervo.acervoespirita.repository.UserRepository;
+import com.acervo.acervoespirita.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +22,7 @@ public class LoanService {
     private final UserRepository userRepository;
     private final ConfigurationService configurationService;
     private final LogService logService;
+    private final ShelfPositionRepository shelfPositionRepository;
 
     // Cria um novo empréstimo
     @Transactional
@@ -39,7 +33,6 @@ public class LoanService {
         if (!user.canBorrow()) {
             throw new IllegalStateException("Usuário não pode realizar empréstimos.");
         }
-
         if (!handledBy.canHandleLoan()) {
             throw new IllegalStateException("Usuário sem permissão para realizar empréstimos.");
         }
@@ -53,13 +46,11 @@ public class LoanService {
         List<BookCopy> copies = new ArrayList<>();
 
         for (Long id : bookCopyIds) {
-
             BookCopy copy = bookCopyRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Exemplar não encontrado."));
 
             if (!copy.isAvailable()) {
                 throw new IllegalStateException("Exemplar " + copy.getCode() + " não está disponível.");
             }
-
             copies.add(copy);
         }
 
@@ -69,18 +60,14 @@ public class LoanService {
                 .build();
 
         loan.calculateDueDate(configuration);
-
         Loan savedLoan = loanRepository.save(loan);
 
         for (BookCopy copy : copies) {
-
             LoanItem loanItem = new LoanItem(savedLoan, copy);
-
             loanItemRepository.save(loanItem);
         }
 
         Loan finalLoan = loanRepository.findById(savedLoan.getId()).orElseThrow(() -> new IllegalArgumentException("Empréstimo não encontrado."));
-
         logService.register(LogType.LOAN_CREATED, handledBy, "Empréstimo #" + finalLoan.getId() + " foi criado para o usuário " + user.getUsername() + ".");
 
         for (BookCopy copy : copies) {
@@ -90,18 +77,64 @@ public class LoanService {
         return finalLoan;
     }
 
-    // Atualiza observação do empréstimo
+    // Finaliza empréstimo devolvendo múltiplos itens
     @Transactional
-    public Loan updateObservation(Long loanId, String observation, User updatedBy) {
+    public Loan finishLoan(Long loanId, List<Long> loanItemIds, Long shelfPositionId, String observation, User handledBy) {
 
         Loan loan = findById(loanId);
 
-        loan.updateObservation(observation);
+        if (!loan.isActive()) {
+            throw new IllegalStateException("Empréstimo já está encerrado.");
+        }
+
+        if (loanItemIds == null || loanItemIds.isEmpty()) {
+            throw new IllegalArgumentException("Nenhum item foi selecionado para devolução.");
+        }
+
+        ShelfPosition shelfPosition = shelfPositionRepository.findById(shelfPositionId)
+                .orElseThrow(() -> new IllegalArgumentException("Prateleira não encontrada."));
+
+        for (Long loanItemId : loanItemIds) {
+
+            LoanItem loanItem = loanItemRepository.findById(loanItemId).orElseThrow(() -> new IllegalArgumentException("Item do empréstimo não encontrado."));
+
+            if (!loanItem.getLoan().equals(loan)) {
+                throw new IllegalStateException("Item não pertence ao empréstimo informado.");
+            }
+
+            if (!loanItem.isReturned()) {
+                loanItem.markAsReturned(shelfPosition);
+                loanItemRepository.save(loanItem);
+                logService.register(LogType.BOOK_RETURNED,handledBy,"Exemplar " + loanItem.getBookCopy().getCode() + " foi devolvido.");
+            }
+        }
+
+        boolean allReturned = loan.getItems().stream().allMatch(LoanItem::isReturned);
+
+        if (!allReturned) {
+            throw new IllegalStateException("Ainda existem livros pendentes neste empréstimo.");
+        }
+
+        loan.close(observation);
 
         Loan updatedLoan = loanRepository.save(loan);
 
-        logService.register(LogType.LOAN_CLOSED, updatedBy, "Observação do empréstimo #" + updatedLoan.getId() + " foi atualizada.");
+        logService.register(
+                LogType.LOAN_CLOSED,
+                handledBy,
+                "Empréstimo #" + updatedLoan.getId() + " foi encerrado."
+        );
 
+        return updatedLoan;
+    }
+
+    // Atualiza observação do empréstimo
+    @Transactional
+    public Loan updateObservation(Long loanId, String observation, User updatedBy) {
+        Loan loan = findById(loanId);
+        loan.updateObservation(observation);
+        Loan updatedLoan = loanRepository.save(loan);
+        logService.register(LogType.LOAN_CLOSED, updatedBy, "Observação do empréstimo #" + updatedLoan.getId() + " foi atualizada.");
         return updatedLoan;
     }
 
@@ -116,6 +149,12 @@ public class LoanService {
     @Transactional(readOnly = true)
     public Loan findActiveLoanByUser(User user) {
         return loanRepository.findByUserAndStatus(user, LoanStatus.OPEN).orElse(null);
+    }
+
+    // Busca empréstimos ativos pelo nome do usuário
+    @Transactional(readOnly = true)
+    public List<Loan> findOpenLoansByUserName(String name) {
+        return loanRepository.findByUser_NameContainingIgnoreCaseAndStatus(name, LoanStatus.OPEN);
     }
 
     // Lista empréstimos do usuário

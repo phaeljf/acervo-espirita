@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Empréstimos')}"></head>
+<body class="bg-light">
+<div class="d-flex">
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <div class="flex-grow-1 p-4">
+        <div th:replace="~{fragments/topbar :: topbar('Empréstimos')}"></div>
+        <div class="mb-4">
+            <div class="d-flex gap-2 mb-3">
+                <a href="/loan/new" class="btn btn-primary">Novo Empréstimo</a>
+                <form method="get" th:action="@{/loan}" class="d-flex gap-2">
+                    <input type="text" name="search" class="form-control" placeholder="Pesquisar usuário..." style="max-width: 350px;" th:value="${search}">
+                    <button type="submit" class="btn btn-secondary">Buscar</button>
+                </form>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div style="max-height: 75vh; overflow-y: auto;">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuário</th>
+                            <th>Quantidade</th>
+                            <th>Data Empréstimo</th>
+                            <th>Vencimento</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(loans)}">
+                            <td colspan="7" class="text-center py-4">Nenhum empréstimo encontrado.</td>
+                        </tr>
+                        <tr th:each="loan : ${loans}">
+                            <td th:text="${loan.id}"></td>
+                            <td th:text="${loan.user.name}"></td>
+                            <td th:text="${loan.items.size()}"></td>
+                            <td th:text="${#temporals.format(loan.loanDate, 'dd/MM/yyyy')}"></td>
+                            <td th:text="${#temporals.format(loan.dueDate, 'dd/MM/yyyy')}"></td>
+                            <td>
+                                <span th:if="${loan.isOverdue()}" class="badge bg-danger">ATRASADO</span>
+                                <span th:if="${!loan.isOverdue()}" class="badge bg-primary">ABERTO</span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a th:href="@{/loan/{id}(id=${loan.id})}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Visualizar
+                                    </a>
+
+                                    <a th:if="${loan.active}"
+                                       th:href="@{/loan/{id}/return(id=${loan.id})}"
+                                       class="btn btn-sm btn-success">
+                                        Devolução
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
