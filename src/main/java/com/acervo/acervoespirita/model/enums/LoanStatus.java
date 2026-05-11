@@ -3,7 +3,8 @@ package com.acervo.acervoespirita.model.enums;
 public enum LoanStatus {
 
     OPEN("Aberto"),
-    CLOSED("Fechado");
+    CLOSED("Fechado"),
+    OVERDUE("Atrasado");
 
     private final String description;
 

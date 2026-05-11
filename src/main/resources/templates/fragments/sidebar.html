@@ -86,19 +86,4 @@
             </ul>
         </div>
     </div>
-    <div class="pt-3">
-        <hr style="border-color:rgba(255,255,255,0.20);">
-        <div class="d-flex align-items-center justify-content-between gap-2">
-            <div>
-                <div class="fw-bold small"
-                     th:text="${loggedUser.name}">
-                </div>
-                <div>
-                    <span th:if="${loggedUser.role.name() == 'ADMIN'}"class="badge bg-danger"> ADMIN</span>
-                    <span th:if="${loggedUser.role.name() == 'STAFF'}"class="badge bg-light text-primary">STAFF</span>
-                </div>
-            </div>
-            <a href="/logout"class="btn btn-sm btn-danger">Sair</a>
-        </div>
-    </div>
 </div>
