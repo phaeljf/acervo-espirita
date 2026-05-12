@@ -23,10 +23,7 @@ public class LoginController {
     }
 
     @GetMapping("/")
-    public String loginPage(
-            HttpSession session,
-            Model model
-    ) {
+    public String loginPage(HttpSession session,Model model) {
 
         if (sessionService.isLogged(session)) {
             return "redirect:/dashboard";
@@ -36,26 +33,16 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String login(
-            @RequestParam String username,
-            HttpSession session,
-            Model model
-    ) {
+    public String login(@RequestParam String username,HttpSession session,Model model) {
 
         try {
-
             User user = userService.findByUsername(username);
-
             sessionService.login(session, user);
 
             return "redirect:/dashboard";
 
         } catch (Exception e) {
-
-            model.addAttribute(
-                    "error",
-                    e.getMessage()
-            );
+            model.addAttribute("error",e.getMessage());
 
             return "login";
         }

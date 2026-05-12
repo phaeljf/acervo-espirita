@@ -55,7 +55,6 @@ public class LoanController {
         }
 
         User loggedUser = sessionService.getLoggedUser(session);
-
         Loan loan = loanService.findById(id);
 
         model.addAttribute("loggedUser", loggedUser);
@@ -90,12 +89,7 @@ public class LoanController {
     ) {
 
         User loggedUser = sessionService.getLoggedUser(session);
-
-        loanService.createLoan(
-                userId,
-                bookCopyIds,
-                loggedUser
-        );
+        loanService.createLoan(userId,bookCopyIds,loggedUser);
 
         return "redirect:/loan";
     }
@@ -105,16 +99,8 @@ public class LoanController {
 
         Loan loan = loanService.findById(id);
         model.addAttribute("loan", loan);
-
-        model.addAttribute(
-                "positions",
-                shelfPositionService.findAll()
-        );
-
-        model.addAttribute(
-                "loggedUser",
-                sessionService.getLoggedUser(session)
-        );
+        model.addAttribute("positions",shelfPositionService.findAll());
+        model.addAttribute("loggedUser",sessionService.getLoggedUser(session));
 
         return "loan/return";
 

@@ -57,11 +57,10 @@ public class BookCopyController {
         model.addAttribute("books", bookService.findAll());
 
         if (bookId != null) {
-
             Book book = bookService.findById(bookId);
-
             model.addAttribute("book", book);
             model.addAttribute("selectedBookId", bookId);
+
         }
 
         return "copies/form";
@@ -75,12 +74,9 @@ public class BookCopyController {
         }
 
         User loggedUser = sessionService.getLoggedUser(session);
+
         try {
-            bookCopyService.createBookCopy(
-                    bookId,
-                    shelfPositionId,
-                    code,
-                    loggedUser
+            bookCopyService.createBookCopy(bookId,shelfPositionId,code,loggedUser
             );
             return "redirect:/copies/book/" + bookId;
 
@@ -94,7 +90,9 @@ public class BookCopyController {
             model.addAttribute("error", e.getMessage());
 
             return "copies/form";
-        }    }
+
+        }
+    }
 
     // Remover exemplar
     @PostMapping("/{id}/delete")
@@ -140,7 +138,6 @@ public class BookCopyController {
         if (copy.getStatus() == BookCopyStatus.LOANED) {
 
             Long bookId = copy.getBook().getId();
-
             redirectAttributes.addFlashAttribute(
                     "error",
                     "Livro emprestado, finalize o empréstimo através do sistema de empréstimos para poder editá-lo."
@@ -174,15 +171,7 @@ public class BookCopyController {
         User loggedUser = sessionService.getLoggedUser(session);
 
         try {
-
-            bookCopyService.updateCopy(
-                    id,
-                    shelfPositionId,
-                    code,
-                    status,
-                    loggedUser
-            );
-
+            bookCopyService.updateCopy(id,shelfPositionId,code,status,loggedUser);
             Long bookId = bookCopyService.findById(id).getBook().getId();
 
             return "redirect:/copies/book/" + bookId;

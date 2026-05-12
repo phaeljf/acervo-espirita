@@ -22,9 +22,7 @@ public class UserController {
     public String listUsers(@RequestParam(required = false) String search, HttpSession session, Model model) {
 
         sessionService.validateAccess(session);
-
         User loggedUser = sessionService.getLoggedUser(session);
-
         model.addAttribute("loggedUser", loggedUser);
         model.addAttribute("search", search);
 
@@ -41,9 +39,7 @@ public class UserController {
     public String newUser(HttpSession session, Model model) {
 
         sessionService.validateAccess(session);
-
         User loggedUser = sessionService.getLoggedUser(session);
-
         model.addAttribute("loggedUser", loggedUser);
         model.addAttribute("user", new User());
 
@@ -66,7 +62,6 @@ public class UserController {
                              Model model) {
 
         sessionService.validateAccess(session);
-
         User loggedUser = sessionService.getLoggedUser(session);
 
         try {
@@ -104,11 +99,8 @@ public class UserController {
     public String detailsUser(@PathVariable Long id, HttpSession session, Model model) {
 
         sessionService.validateAccess(session);
-
         User loggedUser = sessionService.getLoggedUser(session);
-
         User user = userService.findById(id);
-
         model.addAttribute("loggedUser", loggedUser);
         model.addAttribute("user", user);
 
@@ -119,11 +111,8 @@ public class UserController {
     public String editUser(@PathVariable Long id, HttpSession session, Model model) {
 
         sessionService.validateAccess(session);
-
         User loggedUser = sessionService.getLoggedUser(session);
-
         User user = userService.findById(id);
-
         model.addAttribute("loggedUser", loggedUser);
         model.addAttribute("user", user);
 
@@ -135,6 +124,8 @@ public class UserController {
 
         return "users/form";
     }
+
+
     @PostMapping("/{id}")
     public String updateUser(@PathVariable Long id,
                              @RequestParam String name,
@@ -145,11 +136,9 @@ public class UserController {
                              Model model) {
 
         sessionService.validateAccess(session);
-
         User loggedUser = sessionService.getLoggedUser(session);
 
         try {
-
             userService.updateUser(
                     id,
                     name,
@@ -183,6 +172,7 @@ public class UserController {
         sessionService.validateAccess(session);
         User loggedUser = sessionService.getLoggedUser(session);
         userService.deactivateUser(id, loggedUser);
+
         return "redirect:/users";
     }
 
@@ -191,6 +181,7 @@ public class UserController {
         sessionService.validateAccess(session);
         User loggedUser = sessionService.getLoggedUser(session);
         userService.reactivateUser(id, loggedUser);
+
         return "redirect:/users";
     }
 

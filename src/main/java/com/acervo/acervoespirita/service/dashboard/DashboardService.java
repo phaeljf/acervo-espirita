@@ -22,75 +22,29 @@ public class DashboardService {
 
     public DashboardDTO getDashboardData() {
 
-        // =========================
-        // ACERVO
-        // =========================
+        // Acervo
+        long totalBooks = bookRepository.count();
+        long totalCopies = bookCopyRepository.count();
+        long availableCopies = bookCopyRepository.findByStatus(BookCopyStatus.AVAILABLE).size();
+        long loanedCopies = bookCopyRepository.findByStatus(BookCopyStatus.LOANED).size();
 
-        long totalBooks =
-                bookRepository.count();
+        // Empréstimo
+        long activeLoans = loanRepository.findByStatus(LoanStatus.OPEN).size();
+        long overdueLoans = loanRepository.findByStatus(LoanStatus.OVERDUE).size();
 
-        long totalCopies =
-                bookCopyRepository.count();
-
-        long availableCopies =
-                bookCopyRepository
-                        .findByStatus(BookCopyStatus.AVAILABLE)
-                        .size();
-
-        long loanedCopies =
-                bookCopyRepository
-                        .findByStatus(BookCopyStatus.LOANED)
-                        .size();
-
-        // =========================
-        // EMPRÉSTIMOS
-        // =========================
-
-        long activeLoans =
-                loanRepository
-                        .findByStatus(LoanStatus.OPEN)
-                        .size();
-
-        long overdueLoans =
-                loanRepository
-                        .findByStatus(LoanStatus.OVERDUE)
-                        .size();
-
-        // =========================
-        // USUÁRIOS
-        // =========================
-
-        long totalUsers =
-                userRepository.count();
-
-        long totalAdmins =
-                userRepository
-                        .findByRole(UserRole.ADMIN)
-                        .size();
-
-        long totalStaff =
-                userRepository
-                        .findByRole(UserRole.STAFF)
-                        .size();
-
-        long totalFrequentUsers =
-                userRepository
-                        .findByRole(UserRole.USER)
-                        .size();
+        // Usuário
+        long totalUsers = userRepository.count();
+        long totalAdmins = userRepository.findByRole(UserRole.ADMIN).size();
+        long totalStaff = userRepository.findByRole(UserRole.STAFF).size();
+        long totalFrequentUsers = userRepository.findByRole(UserRole.USER).size();
 
         return new DashboardDTO(
-
-                // ACERVO
                 totalBooks,
                 totalCopies,
                 availableCopies,
                 loanedCopies,
-
-                // EMPRÉSTIMOS
                 activeLoans,
                 overdueLoans,
-
-                // USUÁRIOS
                 totalUsers,
                 totalAdmins,
                 totalStaff,

@@ -24,10 +24,7 @@ public class ConfigurationController {
         sessionService.validateAccess(session);
 
         User loggedUser = sessionService.getLoggedUser(session);
-
-        Configuration configuration =
-                configurationService.getCurrentConfiguration();
-
+        Configuration configuration = configurationService.getCurrentConfiguration();
         model.addAttribute("loggedUser", loggedUser);
         model.addAttribute("configuration", configuration);
 
@@ -42,30 +39,20 @@ public class ConfigurationController {
                          Model model) {
 
         sessionService.validateAccess(session);
-
         User loggedUser = sessionService.getLoggedUser(session);
 
         try {
-
             configurationService.updateMaxBooksPerLoan(maxBooksPerLoan);
-
             configurationService.updateLoanDaysLimit(loanDaysLimit);
-
             configurationService.updateAllowRenewal(allowRenewal);
-
-            model.addAttribute("success",
-                    "Configurações atualizadas com sucesso.");
+            model.addAttribute("success","Configurações atualizadas com sucesso.");
 
         } catch (Exception e) {
-
             model.addAttribute("error", e.getMessage());
-
         }
 
         model.addAttribute("loggedUser", loggedUser);
-
-        model.addAttribute("configuration",
-                configurationService.getCurrentConfiguration());
+        model.addAttribute("configuration", configurationService.getCurrentConfiguration());
 
         return "configuration/form";
     }

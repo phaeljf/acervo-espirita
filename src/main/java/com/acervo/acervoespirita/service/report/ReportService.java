@@ -21,10 +21,7 @@ public class ReportService {
 
     private final LoanRepository loanRepository;
 
-    // =========================
-    // RELATÓRIO DE ATRASADOS
-    // =========================
-
+    // Livros atrasados
     public List<OverdueReportDTO> findOverdueBooks() {
 
         List<Loan> overdueLoans =
@@ -64,10 +61,7 @@ public class ReportService {
         return report;
     }
 
-    // =========================
-    // HISTÓRICO POR USUÁRIO
-    // =========================
-
+    // historico de empréstimo por usuário
     public List<UserLoanHistoryDTO> findUserLoanHistory(String search) {
 
         List<UserLoanHistoryDTO> report = new ArrayList<>();
@@ -100,10 +94,7 @@ public class ReportService {
         return report;
     }
 
-    // =========================
-    // LIVROS MENOS EMPRESTADOS
-    // =========================
-
+    // Livrosm enos emprestados
     public List<LeastBorrowedBooksDTO> findLeastBorrowedBooks(
             LocalDate startDate,
             LocalDate endDate

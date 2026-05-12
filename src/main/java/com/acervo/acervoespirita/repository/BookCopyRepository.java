@@ -11,7 +11,11 @@ import java.util.Optional;
 
 public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
 
-    // busca exemplar pelo código único
+
+    // busca exemplar pelo código
+    Optional<BookCopy> findById(Long id);
+
+    // busca exemplar pelo código
     Optional<BookCopy> findByCode(String code);
 
     // verifica se código já existe
@@ -23,17 +27,9 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
     // busca exemplares de um livro
     List<BookCopy> findByBook(Book book);
 
-    // busca exemplares disponíveis de um livro
-    List<BookCopy> findByBookAndStatus(Book book, BookCopyStatus status);
-
     // busca exemplares por localização
     List<BookCopy> findByShelfPosition(ShelfPosition shelfPosition);
 
-    // valida se existe uma localização
-    boolean existsByShelfPosition(ShelfPosition shelfPosition);
 
-    boolean existsByBook(Book book);
-
-    Optional<BookCopy> findById(Long id);
 
 }

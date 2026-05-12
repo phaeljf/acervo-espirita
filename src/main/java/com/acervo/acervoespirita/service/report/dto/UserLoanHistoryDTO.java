@@ -10,15 +10,10 @@ import java.time.LocalDate;
 public class UserLoanHistoryDTO {
 
     private String userName;
-
     private String bookTitle;
-
     private String copyCode;
-
     private LocalDate loanDate;
-
     private LocalDate returnDate;
-
     private String status;
 
 }

@@ -8,9 +8,7 @@ import lombok.Getter;
 public class LeastBorrowedBooksDTO {
 
     private String title;
-
     private String author;
-
     private long totalLoans;
 
 }

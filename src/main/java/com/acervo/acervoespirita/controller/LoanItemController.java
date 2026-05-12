@@ -28,9 +28,7 @@ public class LoanItemController {
         }
 
         User loggedUser = sessionService.getLoggedUser(session);
-
         LoanItem loanItem = loanItemService.findById(id);
-
         Long loanId = loanItem.getLoan().getId();
 
         loanItemService.returnBook(

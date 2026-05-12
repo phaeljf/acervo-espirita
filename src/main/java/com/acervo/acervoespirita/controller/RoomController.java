@@ -28,7 +28,6 @@ public class RoomController {
         }
 
         User loggedUser = sessionService.getLoggedUser(session);
-
         model.addAttribute("loggedUser", loggedUser);
         model.addAttribute("rooms", roomService.findAll());
 
@@ -44,7 +43,6 @@ public class RoomController {
         }
 
         User loggedUser = sessionService.getLoggedUser(session);
-
         model.addAttribute("loggedUser", loggedUser);
         model.addAttribute("room", new Room());
 
@@ -62,13 +60,11 @@ public class RoomController {
         User loggedUser = sessionService.getLoggedUser(session);
 
         try {
-
             roomService.createRoom(room);
 
             return "redirect:/locations";
 
         } catch (IllegalArgumentException e) {
-
             model.addAttribute("loggedUser", loggedUser);
             model.addAttribute("room", room);
             model.addAttribute("error", e.getMessage());
@@ -86,7 +82,6 @@ public class RoomController {
         }
 
         User loggedUser = sessionService.getLoggedUser(session);
-
         model.addAttribute("loggedUser", loggedUser);
         model.addAttribute("room", roomService.findById(id));
 

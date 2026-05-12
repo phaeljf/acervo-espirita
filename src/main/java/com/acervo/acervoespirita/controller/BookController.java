@@ -49,7 +49,6 @@ public class BookController {
         }
 
         User loggedUser = sessionService.getLoggedUser(session);
-
         Book book = bookService.findById(id);
 
         model.addAttribute("loggedUser", loggedUser);
