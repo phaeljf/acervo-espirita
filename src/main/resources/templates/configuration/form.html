@@ -12,14 +12,19 @@
         <div th:if="${error}" class="alert alert-danger">
             <span th:text="${error}"></span>
         </div>
-        <div class="card shadow-sm">
+        <!-- CONFIGURAÇÕES -->
+        <div class="card shadow-sm mb-4">
             <div class="card-body">
                 <form th:action="@{/configuration}" method="post">
                     <div class="mb-4">
-                        <h5 class="fw-bold mb-3">Empréstimos</h5>
+                        <h5 class="fw-bold mb-3">
+                            Empréstimos
+                        </h5>
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label">Máximo de Livros por Empréstimo</label>
+                                <label class="form-label">
+                                    Máximo de Livros por Empréstimo
+                                </label>
                                 <input type="number"
                                        name="maxBooksPerLoan"
                                        class="form-control"
@@ -28,7 +33,9 @@
                                        required>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Dias Limite de Empréstimo</label>
+                                <label class="form-label">
+                                    Dias Limite de Empréstimo
+                                </label>
                                 <input type="number"
                                        name="loanDaysLimit"
                                        class="form-control"
@@ -40,7 +47,9 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Permitir Renovação</label>
+                                <label class="form-label">
+                                    Permitir Renovação
+                                </label>
                                 <select name="allowRenewal"
                                         class="form-select">
                                     <option value="true"
@@ -64,6 +73,22 @@
                             Cancelar
                         </a>
                     </div>
+                </form>
+            </div>
+        </div>
+        <!-- BACKUP -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">
+                    Backup do Sistema
+                </h5>
+                <p class="text-muted">
+                    Gere um backup completo do sistema para restaurar em outro computador futuramente.
+                </p>
+                <form th:action="@{/backup}" method="post">
+                    <button type="submit" class="btn btn-success">
+                        Gerar Backup
+                    </button>
                 </form>
             </div>
         </div>

@@ -24,7 +24,7 @@ hs_err_pid*
 replay_pid*
 
 # Maven
-target/
+/target/
 
 # IntelliJ IDEA
 .idea/
@@ -38,8 +38,17 @@ target/
 Thumbs.db
 
 # SQLite database
+/database/
+/backup/
 *.db
 
 # H2 database files
 *.mv.db
 *.trace.db
+
+# Logs
+/logs/
+
+# Sistema
+.DS_Store
+Thumbs.db
