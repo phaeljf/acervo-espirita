@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Relatório de Atrasados')}"></head>
+<body class="bg-light">
+<div class="d-flex">
+    <!-- SIDEBAR -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <!-- CONTEÚDO -->
+    <div class="flex-grow-1 p-4">
+        <!-- TOPBAR -->
+        <div th:replace="~{fragments/topbar :: topbar('Livros Atrasados')}"></div>
+        <!-- CABEÇALHO -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">
+                    Relatório de Livros Atrasados
+                </h3>
+                <p class="text-muted mb-0">
+                    Lista de exemplares com devolução em atraso.
+                </p>
+            </div>
+            <a href="/reports/overdue/pdf" class="btn btn-danger">
+                Baixar PDF
+            </a>
+        </div>
+        <!-- TABELA -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>
+                                Empréstimo
+                            </th>
+                            <th>
+                                Código
+                            </th>
+                            <th>
+                                Livro
+                            </th>
+                            <th>
+                                Usuário
+                            </th>
+                            <th>
+                                Telefone
+                            </th>
+                            <th>
+                                E-mail
+                            </th>
+                            <th>
+                                Vencimento
+                            </th>
+                            <th>
+                                Dias Atrasado
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(overdueBooks)}">
+                            <td colspan="8"
+                                class="text-center text-muted py-4">
+                                Nenhum livro atrasado encontrado.
+                            </td>
+                        </tr>
+                        <tr th:each="item : ${overdueBooks}">
+                            <td th:text="${item.loanId}">
+                                1
+                            </td>
+                            <td>
+                                <span class="badge bg-dark"
+                                      th:text="${item.copyCode}">
+                                BC001
+                                </span>
+                            </td>
+                            <td th:text="${item.bookTitle}">
+                                Livro
+                            </td>
+                            <td th:text="${item.userName}">
+                                Usuário
+                            </td>
+                            <td th:text="${item.phone}">
+                                Telefone
+                            </td>
+                            <td th:text="${item.email}">
+                                Email
+                            </td>
+                            <td th:text="${item.dueDate}">
+                                2026-01-01
+                            </td>
+                            <td>
+                                <span class="badge bg-danger"
+                                      th:text="${item.overdueDays + ' dias'}">
+                                10 dias
+                                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

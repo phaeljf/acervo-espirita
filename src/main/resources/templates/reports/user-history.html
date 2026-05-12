@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Histórico por Usuário')}"></head>
+<body class="bg-light">
+<div class="d-flex">
+    <!-- SIDEBAR -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <!-- CONTEÚDO -->
+    <div class="flex-grow-1 p-4">
+        <!-- TOPBAR -->
+        <div th:replace="~{fragments/topbar :: topbar('Histórico por Usuário')}"></div>
+        <!-- CABEÇALHO -->
+        <div class="mb-4">
+            <h3 class="fw-bold mb-1">
+                👤 Histórico de Empréstimos
+            </h3>
+            <p class="text-muted mb-0">
+                Consulte o histórico completo de empréstimos por usuário.
+            </p>
+        </div>
+        <!-- PESQUISA -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <form method="get"
+                      action="/reports/user-history">
+                    <div class="row g-2">
+                        <div class="col-md-10">
+                            <input type="text"
+                                   name="search"
+                                   class="form-control"
+                                   placeholder="Digite o nome do usuário..."
+                                   th:value="${search}">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit"
+                                    class="btn btn-primary w-100">
+                                🔍 Pesquisar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- TABELA -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>
+                                Usuário
+                            </th>
+                            <th>
+                                Código
+                            </th>
+                            <th>
+                                Livro
+                            </th>
+                            <th>
+                                Empréstimo
+                            </th>
+                            <th>
+                                Devolução
+                            </th>
+                            <th>
+                                Status
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(history)}">
+                            <td colspan="6"
+                                class="text-center text-muted py-4">
+                                Nenhum histórico encontrado.
+                            </td>
+                        </tr>
+                        <tr th:each="item : ${history}">
+                            <td th:text="${item.userName}">
+                                Usuário
+                            </td>
+                            <td>
+                                <span class="badge bg-dark"
+                                      th:text="${item.copyCode}">
+                                BC001
+                                </span>
+                            </td>
+                            <td th:text="${item.bookTitle}">
+                                Livro
+                            </td>
+                            <td th:text="${item.loanDate}">
+                                2026-01-01
+                            </td>
+                            <td th:text="${item.returnDate != null ? item.returnDate : '-'}">
+                                -
+                            </td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${item.status == 'Devolvido'} ? ' bg-success' : ' bg-warning text-dark'"
+                                      th:text="${item.status}">
+                                Status
+                                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

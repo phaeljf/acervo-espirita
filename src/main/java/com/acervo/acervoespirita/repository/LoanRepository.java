@@ -36,4 +36,12 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     );
 
     // Busca pro usuario
-    List<Loan> findByUser_NameContainingIgnoreCaseAndStatus(String name, LoanStatus status);}
+    List<Loan> findByUser_NameContainingIgnoreCaseAndStatus(String name, LoanStatus status);
+
+    List<Loan> findByUser_NameContainingIgnoreCase(String name);
+
+
+
+}
+
+

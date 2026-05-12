@@ -7,7 +7,7 @@ import com.acervo.acervoespirita.repository.BookCopyRepository;
 import com.acervo.acervoespirita.repository.BookRepository;
 import com.acervo.acervoespirita.repository.LoanRepository;
 import com.acervo.acervoespirita.repository.UserRepository;
-import com.acervo.acervoespirita.service.dashboard.DTO.DashboardDTO;
+import com.acervo.acervoespirita.service.dashboard.dto.DashboardDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

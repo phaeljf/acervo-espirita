@@ -3,7 +3,7 @@ package com.acervo.acervoespirita.controller;
 import com.acervo.acervoespirita.model.User;
 import com.acervo.acervoespirita.service.SessionService;
 import com.acervo.acervoespirita.service.dashboard.DashboardService;
-import com.acervo.acervoespirita.service.dashboard.DTO.DashboardDTO;
+import com.acervo.acervoespirita.service.dashboard.dto.DashboardDTO;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

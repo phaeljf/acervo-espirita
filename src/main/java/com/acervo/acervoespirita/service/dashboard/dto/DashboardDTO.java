@@ -1,4 +1,4 @@
-package com.acervo.acervoespirita.service.dashboard.DTO;
+package com.acervo.acervoespirita.service.dashboard.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

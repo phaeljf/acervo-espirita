@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Livros Menos Emprestados')}"></head>
+<body class="bg-light">
+<div class="d-flex">
+    <!-- SIDEBAR -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    <!-- CONTEÚDO -->
+    <div class="flex-grow-1 p-4">
+        <!-- TOPBAR -->
+        <div th:replace="~{fragments/topbar :: topbar('Livros Menos Emprestados')}"></div>
+        <!-- CABEÇALHO -->
+        <div class="mb-4">
+            <h3 class="fw-bold mb-1">
+                📉 Livros Menos Emprestados
+            </h3>
+            <p class="text-muted mb-0">
+                Consulte os livros menos emprestados em um período específico.
+            </p>
+        </div>
+        <!-- FILTROS -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <form method="get"
+                      action="/reports/least-borrowed">
+                    <div class="row g-2 align-items-end">
+                        <!-- DATA INICIAL -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">
+                                Data Inicial
+                            </label>
+                            <input type="date"
+                                   name="startDate"
+                                   class="form-control"
+                                   th:value="${startDate}">
+                        </div>
+                        <!-- DATA FINAL -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">
+                                Data Final
+                            </label>
+                            <input type="date"
+                                   name="endDate"
+                                   class="form-control"
+                                   th:value="${endDate}">
+                        </div>
+                        <!-- BOTÃO PESQUISAR -->
+                        <div class="col-md-2">
+                            <button type="submit"
+                                    class="btn btn-primary w-100">
+                                🔍 Pesquisar
+                            </button>
+                        </div>
+                        <!-- BOTÃO PDF -->
+                        <div class="col-md-2">
+                            <a th:href="@{/reports/least-borrowed/pdf(startDate=${startDate},endDate=${endDate})}"
+                               class="btn btn-danger w-100"
+                               th:classappend="${report.isEmpty()} ? ' disabled' : ''">
+                                📄 PDF
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- TABELA -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>
+                                Ranking
+                            </th>
+                            <th>
+                                Livro
+                            </th>
+                            <th>
+                                Autor
+                            </th>
+                            <th>
+                                Total de Empréstimos
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- SEM RESULTADO -->
+                        <tr th:if="${#lists.isEmpty(report)}">
+                            <td colspan="4"
+                                class="text-center text-muted py-4">
+                                Nenhum resultado encontrado para o período informado.
+                            </td>
+                        </tr>
+                        <!-- RESULTADOS -->
+                        <tr th:each="item, stat : ${report}">
+                            <td>
+                                <span class="badge bg-secondary"
+                                      th:text="${stat.count}">
+                                1
+                                </span>
+                            </td>
+                            <td th:text="${item.title}">
+                                Livro
+                            </td>
+                            <td th:text="${item.author}">
+                                Autor
+                            </td>
+                            <td>
+                                <span class="badge bg-primary"
+                                      th:text="${item.totalLoans}">
+                                0
+                                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
